@@ -324,7 +324,7 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
     shown.kw += (s.powerKw - shown.kw) * Math.min(1, dt * 6);
     var v = shown.speed / 3.6;
     shown.dist += v * dt;
-    $("speed").textContent = Math.round(shown.speed);
+    $("speed").textContent = fault ? "--" : Math.round(shown.speed);
     $("kw").textContent = Math.round(shown.kw) + " kW";
 
     var accel = (s.speed - lastSpeed) / 3.6 / Math.max(dt, 0.001); lastSpeed = s.speed;
@@ -339,7 +339,8 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
   }
   setInterval(frame, 33);
 
-  window.KingPanel = { update: apply, start: start, setTheme: setTheme };
+  var fault = false;
+  window.KingPanel = { update: apply, start: start, setTheme: setTheme, fault: function (on) { fault = !!on; } };
 
   var SCENES = {
     city: [[0, 0, "P"], [3, 0, "D"], [5, 28], [11, 46], [17, 48], [22, 0], [27, 0], [29, 34, 0, "L"], [36, 52], [43, 58], [48, 22], [52, 22, 0, "R"], [57, 0], [61, 0]],
