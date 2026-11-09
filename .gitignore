@@ -1,2 +1,6 @@
 tools/
 snapshots/
+app/build/
+app/debug.keystore
+app/assets/king-home.html
+app/assets/king-road.html

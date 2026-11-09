@@ -305,11 +305,11 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
     lit();
   }
 
-  var host = window.KingHost || null;
+  var host = window.KingHost || null, liveWin = false;
   var WIN_SECONDS = 3.2;
   function setWindow(id, open) {
+    if (host && host.setWindow && host.setWindow(id, open ? "open" : "close") === false && liveWin) { toast("Window control is not set up yet"); return; }
     goal[id] = open ? 100 : 0;
-    if (host && host.setWindow) host.setWindow(id, open ? "open" : "close");
     
   }
   function toggle(id) { setWindow(id, goal[id] < 50); }
@@ -637,14 +637,15 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
     state = s;
     $("clock").textContent = s.clock; $("date").textContent = s.date; $("autoDay").textContent = s.day || "";
     if (typeof s.cluster === "boolean" && s.cluster !== clusterOn) { clusterOn = s.cluster; $("clusterState").textContent = clusterOn ? "Custom design on" : "BYD original"; }
-    $("temp").textContent = Math.round(s.outsideC) + "°";
-    $("soc").textContent = Math.round(s.soc) + "%"; $("socBar").style.width = s.soc + "%";
-    $("fuel").textContent = Math.round(s.fuelPct) + "%"; $("fuelBar").style.width = s.fuelPct + "%";
-    $("evr").textContent = nf(s.evRangeKm) + " km"; $("tr").textContent = nf(s.totalRangeKm) + " km";
-    $("cpState").innerHTML = s.carplay === "connected" ? '<i class="dot"></i>iPhone connected' : "Connect your iPhone";
+    var ok = function (v) { return typeof v === "number" && isFinite(v); };
+    $("temp").textContent = ok(s.outsideC) ? Math.round(s.outsideC) + "°" : "--";
+    $("soc").textContent = ok(s.soc) ? Math.round(s.soc) + "%" : "--"; $("socBar").style.width = (ok(s.soc) ? Math.max(0, Math.min(100, s.soc)) : 0) + "%";
+    $("fuel").textContent = ok(s.fuelPct) ? Math.round(s.fuelPct) + "%" : "--"; $("fuelBar").style.width = (ok(s.fuelPct) ? Math.max(0, Math.min(100, s.fuelPct)) : 0) + "%";
+    $("evr").textContent = ok(s.evRangeKm) ? nf(s.evRangeKm) + " km" : "--"; $("tr").textContent = ok(s.totalRangeKm) ? nf(s.totalRangeKm) + " km" : "--";
+    $("cpState").innerHTML = s.carplay === "connected" ? '<i class="dot"></i>iPhone connected' : s.carplay === "unknown" ? "Apple CarPlay" : "Connect your iPhone";
     $("brState").textContent = s.parked ? "YouTube and streaming" : "Available when parked";
     document.querySelector('[data-app="browser"]').classList.toggle("wait", !s.parked);
-    if (s.windows && host) WIN.forEach(function (id) { if (typeof s.windows[id] === "number" && s.windows[id] !== win[id]) { win[id] = s.windows[id]; dirty = true; } });
+    if (s.windows) { liveWin = true; WIN.forEach(function (id) { if (ok(s.windows[id]) && s.windows[id] !== win[id]) { win[id] = s.windows[id]; if (Math.abs(goal[id] - win[id]) > 99) goal[id] = win[id] > 50 ? 100 : 0; dirty = true; } }); }
   }
 
   var lastT = Date.now(), lastKey = "";
@@ -659,7 +660,7 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
         if (Math.abs(view.vel) < 1.2) { view.vel = 0; view.ang = Math.round(view.ang); }
       }
     }
-    if (!host) WIN.forEach(function (id) {
+    if (!liveWin) WIN.forEach(function (id) {
       var g = goal[id], v = win[id];
       if (v !== g) { var st = 100 / WIN_SECONDS * dt; win[id] = g > v ? Math.min(g, v + st) : Math.max(g, v - st); dirty = true; }
     });

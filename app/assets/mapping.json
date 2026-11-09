@@ -1,0 +1,31 @@
+{
+  "apps": {
+    "carplay": ["com.byd.carplay.ui", "com.byd.carplay"],
+    "nav": ["com.byd.automap", "com.autonavi.amapauto", "com.waze", "com.google.android.apps.maps"],
+    "browser": ["com.byd.browser", "com.android.browser", "org.chromium.chrome", "com.android.chrome", "org.mozilla.firefox"],
+    "settings": ["com.byd.settings", "com.byd.carsettings", "com.android.settings"]
+  },
+  "read": {
+    "speed": [{"c": "speed.BYDAutoSpeedDevice", "m": "getCurrentSpeed"}],
+    "gear": [{"c": "gearbox.BYDAutoGearboxDevice", "m": "getGearboxAutoModeType"}],
+    "soc": [{"c": "statistic.BYDAutoStatisticDevice", "m": "getElecPercentageValue"}, {"c": "energy.BYDAutoEnergyDevice", "m": "getBatteryPercentage"}],
+    "fuelPct": [{"c": "statistic.BYDAutoStatisticDevice", "m": "getFuelPercentageValue"}],
+    "evRangeKm": [{"c": "statistic.BYDAutoStatisticDevice", "m": "getElecDrivingRangeValue"}, {"c": "statistic.BYDAutoStatisticDevice", "m": "getEVMileageValue"}],
+    "fuelRangeKm": [{"c": "statistic.BYDAutoStatisticDevice", "m": "getFuelDrivingRangeValue"}],
+    "odoKm": [{"c": "statistic.BYDAutoStatisticDevice", "m": "getTotalMileageValue"}],
+    "powerKw": [{"c": "engine.BYDAutoEngineDevice", "m": "getEnginePower"}],
+    "rpm": [{"c": "engine.BYDAutoEngineDevice", "m": "getEngineSpeed"}],
+    "outsideC": [{"c": "instrument.BYDAutoInstrumentDevice", "m": "getOutCarTemperature"}, {"c": "ac.BYDAutoAcDevice", "m": "getTemprature", "a": [4]}],
+    "turnL": [{"c": "light.BYDAutoLightDevice", "m": "getLightStatus", "a": [9]}],
+    "turnR": [{"c": "light.BYDAutoLightDevice", "m": "getLightStatus", "a": [10]}],
+    "winFL": [{"c": "bodywork.BYDAutoBodyworkDevice", "m": "getWindowOpenPercent", "a": [1]}],
+    "winFR": [{"c": "bodywork.BYDAutoBodyworkDevice", "m": "getWindowOpenPercent", "a": [2]}],
+    "winRL": [{"c": "bodywork.BYDAutoBodyworkDevice", "m": "getWindowOpenPercent", "a": [3]}],
+    "winRR": [{"c": "bodywork.BYDAutoBodyworkDevice", "m": "getWindowOpenPercent", "a": [4]}]
+  },
+  "gearMap": {"1": "P", "2": "R", "3": "N", "4": "D", "5": "D", "6": "D"},
+  "write": {
+    "window": {"c": "bodywork.BYDAutoBodyworkDevice", "m": "setBodyWindowCtrlState", "area": {"fl": 1, "fr": 2, "rl": 3, "rr": 4}, "open": 2, "close": 1, "enabled": false}
+  },
+  "cluster": {"displayName": ["fission", "xdja"], "requireSpeed": true}
+}
