@@ -2,8 +2,8 @@
 
 Two products, one app, one 3D car.
 
-1. **Driver display (Road)**: speed and hybrid data on the left, lane ahead with the King from behind on the right.
-2. **Home screen (Garage)**: replaces BYD's home on the 12.8 inch screen. The King in 3D, tap a window to open or close it, big shortcuts to CarPlay, Navigation and Stremio, seasonal themes.
+1. **Driver display (Road)**: speed and hybrid data on the left, the King from behind on a road on the right. The car never moves or angles and no other cars are drawn.
+2. **Home screen**: replaces BYD's home on the 12.8 inch screen. The King as a turntable, tap a window to open or close it, four apps (CarPlay, Navigation, Browser, Settings), seasonal themes.
 
 ## Shared foundation
 
@@ -22,20 +22,20 @@ Design rules, from Polestar, Tesla FSD, XPeng references:
 - Lane edges are 1.5 to 2px hairlines at 25 to 40% white, fading with distance. Dashes slide toward the camera at true road speed.
 - The King renders in its real paint with soft top light and a contact shadow. The tail light bar is the one bright detail and gets brighter under braking.
 - Speed is regular weight Neue Haas, about 170px, with km/h small. P R N D with only the active gear lit. Battery and fuel as value plus thin bar. One accent colour.
-- Motion: dashes match speed, the car sways slightly on lane change (turn signal), the brake light bar responds to deceleration, numbers move smoothly, a short start-up sequence when the car turns on.
+- Motion: dashes match speed, the outer tail lamp segment flashes amber with the real turn signal state, the brake light bar responds to deceleration, numbers move smoothly, a short start-up sequence when the car turns on.
 
 Production path:
 1. Render the King offline from the chase camera in three.js (headless), as transparent PNG layers: body, tail lights normal, tail lights braking, and a few yaw angles for sway. Cheap to draw on the cluster.
 2. Road, lanes and data drawn live on canvas at 30 fps.
 3. Package in the Android host app on the `fission_bg_xdjaVirtualSurface` display after the `AutoContainer` projection call.
 
-## Phase 2: home screen (Garage)
+## Phase 2: home screen
 
 - Android app registered as HOME (BYD lets the owner pick it). One page:
-  - The King in real-time 3D (three.js in a WebView or Filament natively), slow idle turntable, drag to rotate.
+  - The King as a pre-rendered 48 frame turntable (see README), drag to rotate with inertia. Live 3D only if Luiz gets the glTF and the head unit GPU holds 60 fps.
   - Tap a window: the glass animates down, the app calls BYD bodywork window control, and the 3D state follows the real `getWindowOpenPercent`. Same for the trunk and lock status if exposed.
-  - Large shortcuts: CarPlay (`com.byd.carplay.ui`), Navigation (`com.byd.automap` or Waze), Stremio. BYD's own home stays one tap away.
-  - Seasonal themes: Christmas, Halloween, Carnaval, Festa Junina. Each changes the scene around the car (light, ground, a few props) and the accent colour.
+  - Four apps, type only until the head unit's real icons can be read: CarPlay (`com.byd.carplay.ui`) as the large primary, Navigation (`com.byd.automap`), Browser (parked only), Settings (BYD's own settings).
+  - Seasonal themes: Halloween (moon and bats), Christmas (snow), Carnaval (confetti). Auto picks by date, manual choice is remembered.
 - To verify on the car: window control permissions from a third-party app, GPU frame rate with the decimated model, HOME selection on DiLink 3.0.
 
 ## Needed from Luiz

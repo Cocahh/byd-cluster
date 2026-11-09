@@ -1,6 +1,6 @@
-# BYD King driver panel
+# BYD King custom screens
 
-A custom design for the 8.8 inch driver display on Luiz's 2025 King GS (Brazil).
+Custom designs for the 8.8 inch driver display and the 12.8 inch center screen on Luiz's 2025 King GS (Brazil).
 
 ## The car
 
@@ -35,8 +35,23 @@ A custom design for the 8.8 inch driver display on Luiz's 2025 King GS (Brazil).
 
 `#car` shows the panel full screen with no simulation; `#car-demo` runs the simulated drive full screen.
 
+## Home screen
+
+`panel/home.src.html` builds to `panel/king-home.html` (`python3 build.py` builds both screens).
+
+- The car is a 48 frame turntable rendered from the Sketchfab model, not live 3D. Each angle has a closed frame (`cNN.webp`), an open window overlay (`oNN.webp`) and a window id mask (`mNN.png`, value 60 per id, order fl, fr, rl, rr) in `panel/assets/home`.
+- The model has no separate window nodes. Material `Glass` is all window glass and `D_Glass` is only the sunroof, so windows are split from a glass mask render and labelled by projecting onto the door planes.
+- Contract in: `window.KingHome.update({ clock, date, outsideC, soc, fuelPct, evRangeKm, totalRangeKm, carplay, parked, windows: { fl, fr, rl, rr } })` with windows as 0 to 100 percent open. `KingHome.setMode('auto'|'standard'|'halloween'|'christmas'|'carnaval')`.
+- Contract out: `window.KingHost.openApp('carplay'|'nav'|'browser'|'settings')` and `KingHost.setWindow(id, 'open'|'close')`. Without a host the page simulates window travel.
+- The browser row is disabled unless `parked` is true.
+- `#car` shows it full screen. `?still` skips the intro, `?mode=`, `?open=fl,rr` and `?ang=` set up a state for screenshots.
+
 ## Safety rules for any design
 
 - Speed shown must be the car's own speed value, never GPS or a smoothed estimate that lags more than a fraction of a second.
 - BYD's own warning lights must stay visible. Check on the car whether they remain in projection mode before driving with a custom panel.
 - Closing the app or a crash must return the display to BYD's original panel.
+
+## Re-rendering the car
+
+`render/` holds the pipeline: `gen_jobs.py` writes the camera jobs (48 angles, four passes: closed, glass hidden, glass mask, silhouette), `node cdp.mjs file://$PWD/sk.html jobs.json out` renders them through the Sketchfab viewer in headless Chrome, and `compose.py` turns the output into `panel/assets/home`. Paths inside the scripts point at a scratch folder and need adjusting before a new run.

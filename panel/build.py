@@ -1,15 +1,27 @@
-import base64, re, sys
+import base64, json, re, sys
 from pathlib import Path
 
 here = Path(__file__).parent
-src = (here / "road.src.html").read_text()
 mime = {".png": "image/png", ".woff": "font/woff", ".webp": "image/webp"}
+
+def uri(p):
+    return f"data:{mime[p.suffix]};base64," + base64.b64encode(p.read_bytes()).decode()
 
 def inline(m):
     kind, name = m.group(1), m.group(2)
-    p = here / ("assets" if kind == "img" else "fonts") / name
-    return f"data:{mime[p.suffix]};base64," + base64.b64encode(p.read_bytes()).decode()
+    return uri(here / ("assets" if kind == "img" else "fonts") / name)
 
-out = re.sub(r"\{\{(img|font):([^}]+)\}\}", inline, src)
-(here / "king-road.html").write_text(out)
-print("king-road.html", len(out) // 1024, "KB")
+def build(src, out, extra=None):
+    text = (here / src).read_text()
+    for k, v in (extra or {}).items():
+        text = text.replace("{{" + k + "}}", v)
+    text = re.sub(r"\{\{(img|font):([^}]+)\}\}", inline, text)
+    (here / out).write_text(text)
+    print(out, len(text) // 1024, "KB")
+
+build("road.src.html", "king-road.html")
+
+home = here / "assets" / "home"
+meta = json.loads((home / "meta.json").read_text())
+frames = [{k: uri(home / f"{k}{i:02d}.{'png' if k == 'm' else 'webp'}") for k in "com"} for i in range(meta["n"])]
+build("home.src.html", "king-home.html", {"frames": json.dumps(frames), "fw": str(meta["fw"]), "fh": str(meta["fh"]), "ms": str(meta["ms"])})

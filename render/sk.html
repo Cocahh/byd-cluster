@@ -1,0 +1,55 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>html,body{margin:0;background:transparent;width:1600px;height:1000px;overflow:hidden}iframe{width:1600px;height:1000px;border:0}</style>
+<script src="https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js"></script>
+</head><body>
+<iframe id="f" allow="autoplay; fullscreen; xr-spatial-tracking"></iframe>
+<script>
+window.__state = "init";
+var client = new Sketchfab(document.getElementById("f"));
+client.init("c3bdefa332384e95a9fd249d0abb25c3", {
+  autostart: 1, preload: 1, transparent: 1, ui_controls: 0, ui_infos: 0, ui_stop: 0, ui_watermark: 0, ui_watermark_link: 0,
+  ui_hint: 0, ui_loading: 0, ui_help: 0, ui_settings: 0, ui_vr: 0, ui_fullscreen: 0, ui_annotations: 0, ui_inspector: 0, ui_ar: 0, dnt: 1,
+  success: function (api) {
+    window.__api = api;
+    api.start();
+    api.addEventListener("viewerready", function () {
+      api.setBackground({ transparent: true }, function () {});
+      api.getMaterialList(function (err, mats) { window.__mats = (mats || []).map(function (m) { return m.name; }); });
+      window.__state = "ready";
+      api.getCameraLookAt(function (err, cam) { window.__cam = cam; });
+      api.getSceneGraph(function (err, g) { window.__graphErr = err; window.__graph = g; });
+    });
+  },
+  error: function () { window.__state = "error"; }
+});
+window.setup = function (o) {
+  return new Promise(function (res) {
+    if (o.env) __api.setEnvironment(o.env, function () {});
+    if (o.pp) __api.setPostProcessing(o.pp, function () {});
+    if (o.bg) __api.setBackground({ color: o.bg }, function () {});
+    __api.getMaterialList(function (err, mats) {
+      var hits = [];
+      mats.forEach(function (m) {
+        var patch = (o.mats || {})[m.name];
+        if (o.allWhite) patch = { EmitColor: { enable: true, factor: 1, color: [1, 1, 1] }, AlbedoPBR: { color: [1, 1, 1], texture: undefined }, Opacity: { enable: false }, DiffuseColor: { color: [1, 1, 1], texture: undefined } };
+        if (o.blackExcept) { var c = o.blackExcept[m.name] || [0, 0, 0]; patch = { EmitColor: { enable: true, factor: 1, color: c }, AlbedoPBR: { color: [0, 0, 0], texture: undefined, factor: 0 }, DiffuseColor: { color: [0, 0, 0], texture: undefined }, Opacity: { enable: false }, SpecularF0: { factor: 0 }, MetalnessPBR: { factor: 0, texture: undefined }, RoughnessPBR: { factor: 1, texture: undefined }, GlossinessPBR: { factor: 0 }, ClearCoat: { enable: false }, SpecularPBR: { factor: 0 }, SpecularColor: { factor: 0 } }; }
+        if (!patch) return;
+        Object.keys(patch).forEach(function (c) { if (m.channels[c]) Object.keys(patch[c]).forEach(function (k) { m.channels[c][k] = patch[c][k]; }); });
+        __api.setMaterial(m); hits.push(m.name);
+      });
+      setTimeout(function () { res("ok " + hits.join(",")); }, 800);
+    });
+  });
+};
+window.shot = function (pos, target, w, h) {
+  return new Promise(function (res) {
+    __api.setCameraLookAt(pos, target, 0, function () {
+      setTimeout(function () {
+        __api.getScreenShot(w, h, "image/png", function (err, data) { res(err ? "ERR" : data); });
+      }, 1500);
+    });
+  });
+};
+</script>
+</body></html>

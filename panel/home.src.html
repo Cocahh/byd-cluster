@@ -1,0 +1,515 @@
+<meta charset="utf-8">
+<title>King Home Screen</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+@font-face { font-family: "NHD"; font-weight: 300; src: url("{{font:nhd-light.woff}}") format("woff"); }
+@font-face { font-family: "NHD"; font-weight: 400; src: url("{{font:nhd-roman.woff}}") format("woff"); }
+@font-face { font-family: "NHD"; font-weight: 500; src: url("{{font:nhd-mediu.woff}}") format("woff"); }
+:root {
+  --bg: #F1F1EF; --fg: #121212; --muted: #64645F; --line: #D7D7D3;
+  --f: "NHD", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #0A0A0A; --fg: #EDEDEB; --muted: #8E8E89; --line: #242424; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --bg: #0A0A0A; --fg: #EDEDEB; --muted: #8E8E89; --line: #242424; color-scheme: dark; }
+html, body { height: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--fg); font-family: var(--f);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 1180px; margin: 0 auto; padding-block: 40px 56px; display: grid; gap: 22px; }
+.head { display: grid; gap: 6px; }
+.head h1 { margin: 0; font-size: clamp(28px, 4vw, 38px); font-weight: 500; letter-spacing: 0; }
+.head p { margin: 0; color: var(--muted); font-size: 17px; line-height: 1.45; max-width: 60ch; }
+.stage { position: relative; width: 100%; aspect-ratio: 1920 / 1200; border-radius: 14px; overflow: hidden; background: #000; }
+.credit { color: var(--muted); font-size: 13px; line-height: 1.5; margin: 0; }
+
+.h {
+  --ink: #F3F3F1; --dim: #8D8D88; --faint: #4A4A47; --hair: #222221; --track: #1E1E1D; --accent: #FF7A1A;
+  position: absolute; left: 0; top: 0; width: 1920px; height: 1200px; transform-origin: 0 0;
+  background: #000; color: var(--ink); font-family: var(--f); letter-spacing: 0;
+  font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1;
+  overflow: hidden; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent;
+}
+.h * { box-sizing: border-box; }
+.h button { font: inherit; color: inherit; background: none; border: 0; padding: 0; margin: 0; cursor: pointer; text-align: left; letter-spacing: 0; }
+.h button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.h[data-theme="halloween"] { --accent: #FF6A13; }
+.h[data-theme="christmas"] { --accent: #E5392C; }
+.h[data-theme="carnaval"] { --accent: #F4C21B; }
+
+.h .fx { position: absolute; left: 0; top: 0; width: 1340px; height: 1200px; pointer-events: none; }
+
+.h .time { position: absolute; left: 72px; top: 52px; }
+.h .time b { display: block; font-size: 132px; line-height: 1; font-weight: 300; margin-left: -6px; }
+.h .time span { display: block; margin-top: 10px; font-size: 28px; color: var(--dim); }
+.h .time em { display: block; margin-top: 6px; font-size: 28px; font-style: normal; color: var(--accent); height: 36px; transition: opacity .6s var(--ease); }
+
+.h .out { position: absolute; left: 1040px; top: 68px; width: 252px; text-align: right; }
+.h .out span { display: block; font-size: 22px; color: var(--dim); }
+.h .out b { display: block; margin-top: 6px; font-size: 52px; line-height: 1; font-weight: 300; }
+
+.h .carbox { position: absolute; left: 36px; top: 262px; width: 1280px; touch-action: none; cursor: grab; outline: none; }
+.h .carbox.drag { cursor: grabbing; }
+.h .carbox canvas { display: block; width: 100%; }
+
+.h .glass { position: absolute; left: 72px; top: 874px; display: flex; align-items: baseline; gap: 30px; font-size: 26px; }
+.h .glass p { margin: 0; min-width: 330px; }
+.h .glass button { color: var(--ink); padding: 12px 0; border-bottom: 1px solid var(--faint); transition: border-color .3s var(--ease); }
+.h .glass button:active { border-bottom-color: var(--accent); }
+.h .glass i { font-style: normal; color: var(--faint); transition: opacity .8s var(--ease); }
+.h .glass i.off { opacity: 0; }
+
+.h .stats { position: absolute; left: 72px; top: 958px; display: flex; gap: 64px; }
+.h .stat { width: 190px; }
+.h .stat span { display: block; font-size: 22px; color: var(--dim); }
+.h .stat b { display: block; margin-top: 8px; font-size: 46px; line-height: 1; font-weight: 400; }
+.h .stat i { display: block; margin-top: 16px; height: 3px; border-radius: 2px; background: var(--track); position: relative; overflow: hidden; }
+.h .stat i u { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--ink); border-radius: 2px; transition: width .9s var(--ease); }
+.h .stat.fuel i u { background: var(--accent); }
+
+.h .modes { position: absolute; left: 72px; top: 1098px; display: flex; gap: 34px; font-size: 22px; }
+.h .modes button { color: var(--faint); padding: 14px 0 10px; border-bottom: 2px solid transparent; transition: color .3s var(--ease), border-color .3s var(--ease); }
+.h .modes button[aria-pressed="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+
+.h .rail { position: absolute; left: 1380px; top: 60px; width: 468px; height: 1080px; display: flex; flex-direction: column; }
+.h .app { position: relative; display: flex; flex-direction: column; justify-content: center; width: 100%; flex: 1; padding: 0 6px; border-top: 1px solid var(--hair); transition: background-color .2s var(--ease), opacity .4s var(--ease); }
+.h .app b { display: block; font-size: 50px; line-height: 1.05; font-weight: 400; transition: transform .25s var(--ease); }
+.h .app span { display: block; margin-top: 10px; font-size: 24px; color: var(--dim); }
+.h .app:active b { transform: translateX(10px); }
+.h .app.main { flex: none; height: 330px; margin-bottom: 26px; border: 0; border-radius: 30px; background: var(--ink); color: #0A0A0A; padding: 0 36px 38px; justify-content: flex-end; transition: transform .25s var(--ease); }
+.h .app.main b { font-size: 84px; font-weight: 400; margin-left: -4px; }
+.h .app.main span { color: #5A5A55; font-size: 26px; margin-top: 12px; }
+.h .app.main:active { transform: scale(0.985); }
+.h .app.main:active b { transform: none; }
+.h .app.main .dot { display: inline-block; width: 11px; height: 11px; border-radius: 50%; background: #2A9D58; margin-right: 12px; vertical-align: 2px; }
+.h .app.main + .app { border-top-color: transparent; }
+.h .app.wait b { color: var(--faint); }
+
+.h .toast { position: absolute; right: 628px; bottom: 50px; transform: translateY(16px); background: var(--ink); color: #0A0A0A; font-size: 24px; padding: 18px 26px; border-radius: 14px; opacity: 0; pointer-events: none; transition: opacity .35s var(--ease), transform .35s var(--ease); }
+.h .toast.on { opacity: 1; transform: none; }
+
+.h .time, .h .out, .h .glass, .h .stats, .h .modes, .h .rail > * { transition-property: opacity, transform, background-color; transition-duration: .9s, .9s, .2s; transition-timing-function: var(--ease); }
+.h.intro .time, .h.intro .out, .h.intro .glass, .h.intro .stats, .h.intro .modes { opacity: 0; transform: translateY(10px); transition: none; }
+.h.intro .rail > * { opacity: 0; transform: translateX(22px); transition: none; }
+.h.on .rail > *:nth-child(1) { transition-delay: .25s, .25s, 0s; } .h.on .rail > *:nth-child(2) { transition-delay: .33s, .33s, 0s; }
+.h.on .rail > *:nth-child(3) { transition-delay: .41s, .41s, 0s; } .h.on .rail > *:nth-child(4) { transition-delay: .49s, .49s, 0s; }
+.h.on .glass { transition-delay: .55s, .55s, 0s; } .h.on .stats { transition-delay: .65s, .65s, 0s; } .h.on .modes { transition-delay: .75s, .75s, 0s; }
+.h.live .rail > *, .h.live .time, .h.live .out, .h.live .glass, .h.live .stats, .h.live .modes { transition-delay: 0s; transition-duration: .25s; }
+
+.h.still, .h.still * { transition: none !important; }
+body.car { padding: 0; background: #000; overflow: hidden; }
+body.car .page { display: block; max-width: none; padding: 0; height: 100%; }
+body.car .head, body.car .credit { display: none; }
+body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 0; }
+@media (prefers-reduced-motion: reduce) { .h * { transition: none !important; } }
+</style>
+
+<div class="page">
+  <header class="head">
+    <h1>King Home Screen</h1>
+    <p>The home screen for the center display. Drag the car to turn it, tap a window to lower it, and reach CarPlay in one touch.</p>
+  </header>
+
+  <div class="stage" id="stage">
+    <div class="h intro" id="h" data-theme="standard">
+      <canvas class="fx" id="fxBack" width="1340" height="1200"></canvas>
+
+      <div class="time"><b id="clock">00:00</b><span id="date"></span><em id="greet"></em></div>
+      <div class="out"><span>Outside</span><b id="temp">0°</b></div>
+
+      <div class="carbox" id="carbox" tabindex="0" role="img" aria-label="Your King. Drag to turn it, tap a window to open or close it."><canvas id="car"></canvas></div>
+      <canvas class="fx" id="fxFront" width="1340" height="1200"></canvas>
+
+      <div class="glass">
+        <p id="glassText" role="status">All windows closed</p>
+        <button type="button" id="winAll">Open all</button>
+        <i id="hint">Drag to turn. Tap a window.</i>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><span>Battery</span><b id="soc">0%</b><i><u id="socBar"></u></i></div>
+        <div class="stat fuel"><span>Fuel</span><b id="fuel">0%</b><i><u id="fuelBar"></u></i></div>
+        <div class="stat"><span>Electric range</span><b id="evr">0 km</b></div>
+        <div class="stat"><span>Total range</span><b id="tr">0 km</b></div>
+      </div>
+
+      <div class="modes" role="group" aria-label="Theme">
+        <button type="button" data-mode="auto" aria-pressed="true">Auto</button>
+        <button type="button" data-mode="standard" aria-pressed="false">Standard</button>
+        <button type="button" data-mode="halloween" aria-pressed="false">Halloween</button>
+        <button type="button" data-mode="christmas" aria-pressed="false">Christmas</button>
+        <button type="button" data-mode="carnaval" aria-pressed="false">Carnaval</button>
+      </div>
+
+      <div class="rail">
+        <button type="button" class="app main" data-app="carplay"><b>CarPlay</b><span id="cpState"></span></button>
+        <button type="button" class="app" data-app="nav"><b>Navigation</b><span>Maps and routes</span></button>
+        <button type="button" class="app" data-app="browser"><b>Browser</b><span id="brState">YouTube and streaming</span></button>
+        <button type="button" class="app" data-app="settings"><b>Settings</b><span>Car and display</span></button>
+      </div>
+
+      <div class="toast" id="toast" role="status"></div>
+    </div>
+  </div>
+
+  <p class="credit">3D model: 2025 BYD Seal 5 DM-i by ddiaz-design on Sketchfab, CC BY-NC-SA 4.0. Typeface: Neue Haas Display.</p>
+</div>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var H = $("h"), stage = $("stage");
+  var q = location.search + location.hash;
+  var carMode = /#car/.test(location.hash);
+  if (carMode) document.body.classList.add("car");
+  var scale = 1;
+
+  function fit() {
+    var w = stage.clientWidth, h = stage.clientHeight; if (!w || !h) return;
+    scale = carMode ? Math.min(w / 1920, h / 1200) : w / 1920;
+    var ox = carMode ? (w - 1920 * scale) / 2 : 0, oy = carMode ? (h - 1200 * scale) / 2 : 0;
+    H.style.transform = "translate(" + ox + "px," + oy + "px) scale(" + scale + ")";
+  }
+  if (window.ResizeObserver) new ResizeObserver(fit).observe(stage);
+  window.addEventListener("resize", fit); fit();
+
+  var FR = {{frames}};
+  var N = FR.length, FW = {{fw}}, FH = {{fh}}, MS = {{ms}};
+  var WIN = ["fl", "fr", "rl", "rr"];
+  var NAMES = { fl: "Front left", fr: "Front right", rl: "Rear left", rr: "Rear right" };
+  var cv = $("car"), ctx = cv.getContext("2d");
+  cv.width = FW; cv.height = FH;
+  $("carbox").style.top = Math.round(256 + (600 - FH) / 2) + "px";
+  var tmp = document.createElement("canvas"); tmp.width = FW; tmp.height = FH;
+  var tctx = tmp.getContext("2d");
+  var MW = Math.round(FW * MS), MH = Math.round(FH * MS);
+  var mcv = document.createElement("canvas"); mcv.width = MW; mcv.height = MH;
+  var mctx = mcv.getContext("2d", { willReadFrequently: true });
+
+  var imgs = { c: [], o: [], m: [] }, dirty = true;
+  function load(key, i) {
+    var arr = imgs[key];
+    if (!arr[i]) { var im = new Image(); arr[i] = im; im.onload = function () { dirty = true; }; im.src = FR[i][key]; }
+    return arr[i];
+  }
+  function ready(im) { return im && im.complete && im.naturalWidth > 0; }
+
+  var maskCache = { idx: -1 };
+  function maskFor(idx) {
+    if (maskCache.idx === idx) return maskCache;
+    var im = load("m", idx);
+    if (!ready(im)) return null;
+    mctx.clearRect(0, 0, MW, MH); mctx.drawImage(im, 0, 0, MW, MH);
+    var px = mctx.getImageData(0, 0, MW, MH).data, ids = new Uint8Array(MW * MH), wins = {}, k;
+    for (k = 0; k < 4; k++) wins[WIN[k]] = { x0: MW, y0: MH, x1: -1, y1: -1, n: 0 };
+    for (var p = 0, i = 0; p < ids.length; p++, i += 4) {
+      var id = Math.round(px[i] / 60);
+      if (id < 1 || id > 4 || px[i + 3] < 128) continue;
+      ids[p] = id;
+      var b = wins[WIN[id - 1]], x = p % MW, y = (p / MW) | 0;
+      if (x < b.x0) b.x0 = x; if (x > b.x1) b.x1 = x; if (y < b.y0) b.y0 = y; if (y > b.y1) b.y1 = y; b.n++;
+    }
+    for (k = 0; k < 4; k++) {
+      var bb = wins[WIN[k]];
+      if (bb.n < 24) { wins[WIN[k]] = null; continue; }
+      var c = document.createElement("canvas"); c.width = bb.x1 - bb.x0 + 1; c.height = bb.y1 - bb.y0 + 1;
+      var cc = c.getContext("2d"), o = cc.createImageData(c.width, c.height);
+      for (var yy = 0; yy < c.height; yy++) for (var xx = 0; xx < c.width; xx++) {
+        if (ids[(yy + bb.y0) * MW + xx + bb.x0] === k + 1) o.data[(yy * c.width + xx) * 4 + 3] = 255;
+      }
+      cc.putImageData(o, 0, 0); bb.canvas = c;
+    }
+    maskCache = { idx: idx, wins: wins, ids: ids };
+    return maskCache;
+  }
+
+  var HERO = Math.round(N * 37.5 / 360);
+  var view = { ang: HERO, vel: 0, from: 0, to: HERO, t: 1, dur: 1, dragging: false };
+  var win = { fl: 0, fr: 0, rl: 0, rr: 0 }, goal = { fl: 0, fr: 0, rl: 0, rr: 0 };
+  var shownIdx = -1;
+  function mod(a, n) { return ((a % n) + n) % n; }
+  function ease(t) { return 1 - Math.pow(1 - t, 4); }
+  function glide(to, dur) { view.from = view.ang; view.to = to; view.t = 0; view.dur = dur; view.vel = 0; }
+
+  function draw() {
+    var idx = mod(Math.round(view.ang), N), im = load("c", idx);
+    if (!ready(im)) { dirty = true; return; }
+    if (shownIdx !== idx) { shownIdx = idx; if (!view.dragging && !view.vel) load("o", idx); }
+    ctx.clearRect(0, 0, FW, FH);
+    ctx.drawImage(im, 0, 0, FW, FH);
+    if (win.fl + win.fr + win.rl + win.rr < 0.5) return;
+    var m = maskFor(idx), op = load("o", idx);
+    if (!m || !ready(op)) { dirty = true; return; }
+    var s = 1 / MS;
+    for (var k = 0; k < 4; k++) {
+      var id = WIN[k], b = m.wins[id], p = win[id] / 100;
+      if (!b || p <= 0.004) continue;
+      var x = b.x0 * s, y = b.y0 * s, w = b.canvas.width * s, h = b.canvas.height * s;
+      tctx.globalCompositeOperation = "copy";
+      tctx.drawImage(b.canvas, x, y, w, h);
+      tctx.globalCompositeOperation = "source-in";
+      tctx.drawImage(op, 0, 0, FW, FH);
+      ctx.drawImage(tmp, x, y, w, h * p, x, y, w, h * p);
+    }
+  }
+
+  var host = window.KingHost || null;
+  var WIN_SECONDS = 3.2;
+  function setWindow(id, open) {
+    goal[id] = open ? 100 : 0;
+    if (host && host.setWindow) host.setWindow(id, open ? "open" : "close");
+    $("hint").classList.add("off");
+  }
+  function toggle(id) { setWindow(id, goal[id] < 50); }
+  $("winAll").addEventListener("click", function () {
+    var anyOpen = WIN.some(function (id) { return goal[id] > 50; });
+    WIN.forEach(function (id) { setWindow(id, !anyOpen); });
+  });
+  function glassText() {
+    var moving = WIN.filter(function (id) { return Math.abs(goal[id] - win[id]) > 0.5; });
+    var open = WIN.filter(function (id) { return win[id] > 99; });
+    var t;
+    if (moving.length === 1) t = NAMES[moving[0]] + " window " + (goal[moving[0]] > 50 ? "opening" : "closing");
+    else if (moving.length > 1) {
+      var up = moving.filter(function (id) { return goal[id] > 50; }).length;
+      t = "Windows " + (up === moving.length ? "opening" : up === 0 ? "closing" : "moving");
+    }
+    else if (open.length === 0) t = "All windows closed";
+    else if (open.length === 4) t = "All windows open";
+    else if (open.length === 1) t = NAMES[open[0]] + " window open";
+    else t = open.length + " windows open";
+    $("glassText").textContent = t;
+    $("winAll").textContent = WIN.some(function (id) { return goal[id] > 50; }) ? "Close all" : "Open all";
+  }
+
+  var box = $("carbox"), ptr = null;
+  var PX_PER_FRAME = 1280 / (N * 0.42);
+  box.addEventListener("pointerdown", function (e) {
+    ptr = { id: e.pointerId, last: e.clientX, moved: 0, t: Date.now() };
+    view.dragging = true; view.vel = 0; view.t = 1;
+    try { box.setPointerCapture(e.pointerId); } catch (err) {}
+  });
+  box.addEventListener("pointermove", function (e) {
+    if (!ptr || e.pointerId !== ptr.id) return;
+    var dx = (e.clientX - ptr.last) / scale, now = Date.now();
+    ptr.moved += Math.abs(e.clientX - ptr.last); ptr.last = e.clientX;
+    if (ptr.moved > 8) {
+      box.classList.add("drag"); $("hint").classList.add("off");
+      var d = -dx / PX_PER_FRAME;
+      view.ang += d;
+      view.vel = view.vel * 0.5 + 0.5 * d / Math.max(0.012, (now - ptr.t) / 1000);
+      ptr.t = now; dirty = true;
+    }
+  });
+  function hitWindow(e) {
+    var r = cv.getBoundingClientRect(), m = maskFor(shownIdx < 0 ? HERO : shownIdx);
+    if (!m) return 0;
+    var mx = Math.round((e.clientX - r.left) / r.width * MW), my = Math.round((e.clientY - r.top) / r.height * MH);
+    for (var rad = 0; rad <= 12; rad += 4) for (var a = 0; a < 8; a++) {
+      var qx = mx + Math.round(Math.cos(a * 0.785) * rad), qy = my + Math.round(Math.sin(a * 0.785) * rad);
+      if (qx >= 0 && qy >= 0 && qx < MW && qy < MH && m.ids[qy * MW + qx]) return m.ids[qy * MW + qx];
+    }
+    return 0;
+  }
+  function release(e) {
+    if (!ptr || e.pointerId !== ptr.id) return;
+    var tap = ptr.moved <= 8, idle = Date.now() - ptr.t > 90;
+    box.classList.remove("drag"); view.dragging = false; ptr = null;
+    if (tap) { view.vel = 0; var hit = hitWindow(e); if (hit) toggle(WIN[hit - 1]); return; }
+    if (idle) view.vel = 0;
+    view.vel = Math.max(-44, Math.min(44, view.vel));
+  }
+  box.addEventListener("pointerup", release);
+  box.addEventListener("pointercancel", function (e) { if (ptr && e.pointerId === ptr.id) { ptr = null; view.dragging = false; view.vel = 0; box.classList.remove("drag"); } });
+  box.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowLeft") glide(Math.round(view.ang) - 2, 0.4);
+    if (e.key === "ArrowRight") glide(Math.round(view.ang) + 2, 0.4);
+  });
+
+  var toastT = 0;
+  function toast(msg) {
+    var t = $("toast"); t.textContent = msg; t.classList.add("on");
+    clearTimeout(toastT); toastT = setTimeout(function () { t.classList.remove("on"); }, 2600);
+  }
+  var APP_NAMES = { carplay: "CarPlay", nav: "Navigation", browser: "The browser", settings: "Settings" };
+  var state = null;
+  Array.prototype.forEach.call(document.querySelectorAll("[data-app]"), function (b) {
+    b.addEventListener("click", function () {
+      var app = b.getAttribute("data-app");
+      if (app === "browser" && state && !state.parked) { toast("The browser opens when the car is parked"); return; }
+      if (host && host.openApp) host.openApp(app);
+      else toast(APP_NAMES[app] + " opens from here in the car");
+    });
+  });
+
+  var GREET = { standard: "", halloween: "Happy Halloween", christmas: "Feliz Natal", carnaval: "Bom Carnaval" };
+  function easter(y) {
+    var a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25);
+    var g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30, i = Math.floor(c / 4), k = c % 4;
+    var l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451);
+    return new Date(y, Math.floor((h + l - 7 * m + 114) / 31) - 1, ((h + l - 7 * m + 114) % 31) + 1);
+  }
+  function autoTheme(d) {
+    var m = d.getMonth() + 1, day = d.getDate();
+    if (m === 10 && day >= 24) return "halloween";
+    if (m === 12 && day <= 26) return "christmas";
+    var tue = easter(d.getFullYear()); tue.setDate(tue.getDate() - 47);
+    var diff = Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()) - tue) / 86400000);
+    if (diff >= -4 && diff <= 1) return "carnaval";
+    return "standard";
+  }
+  var modePref = "auto", theme = "", prevTheme = "", themeAt = 0, parts = [], oldParts = [];
+  try { modePref = localStorage.getItem("king-home-mode") || "auto"; } catch (err) {}
+  function applyMode(pref, quiet) {
+    if (pref !== "auto" && !(pref in GREET)) pref = "auto";
+    modePref = pref;
+    if (!quiet) { try { localStorage.setItem("king-home-mode", pref); } catch (err) {} }
+    Array.prototype.forEach.call(document.querySelectorAll("[data-mode]"), function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-mode") === pref ? "true" : "false"); });
+    var next = pref === "auto" ? autoTheme(new Date()) : pref;
+    if (next === theme) return;
+    prevTheme = theme; oldParts = parts; theme = next; themeAt = Date.now(); parts = seed(theme);
+    H.setAttribute("data-theme", theme);
+    var g = $("greet"); g.style.opacity = 0;
+    setTimeout(function () { g.textContent = GREET[theme]; g.style.opacity = 1; }, 300);
+  }
+  Array.prototype.forEach.call(document.querySelectorAll("[data-mode]"), function (b) {
+    b.addEventListener("click", function () { applyMode(b.getAttribute("data-mode")); });
+  });
+
+  var fb = $("fxBack").getContext("2d"), ff = $("fxFront").getContext("2d");
+  var CONF = ["#F4C21B", "#2FA35B", "#E5392C", "#2E7BE3", "#F3F3F1", "#E052A0"];
+  function rnd(a, b) { return a + Math.random() * (b - a); }
+  function seed(name) {
+    var out = [], i;
+    if (name === "christmas") for (i = 0; i < 170; i++) out.push({ x: rnd(0, 1340), y: rnd(-1200, 1200), r: rnd(1.2, 4.4), v: rnd(24, 74), ph: rnd(0, 6.3), front: i % 5 === 0 });
+    if (name === "carnaval") for (i = 0; i < 120; i++) out.push({ x: rnd(0, 1340), y: rnd(-1200, 1200), w: rnd(9, 17), h: rnd(5, 9), v: rnd(60, 150), ph: rnd(0, 6.3), sp: rnd(1.5, 4), c: CONF[i % CONF.length], front: i % 4 === 0 });
+    if (name === "halloween") for (i = 0; i < 6; i++) out.push({ x: rnd(300, 1300), y: rnd(220, 600), v: rnd(60, 120), s: rnd(0.8, 1.7), ph: rnd(0, 6.3), dir: i % 2 ? 1 : -1 });
+    return out;
+  }
+  function bat(c, x, y, s, flap) {
+    var w = 30 * s, up = (0.2 + 0.8 * Math.abs(flap)) * 14 * s;
+    c.beginPath();
+    c.moveTo(x, y + 3 * s);
+    c.quadraticCurveTo(x - w * 0.45, y - up, x - w, y - up * 0.2);
+    c.quadraticCurveTo(x - w * 0.72, y + s, x - w * 0.55, y + 6 * s);
+    c.quadraticCurveTo(x - w * 0.3, y + s, x, y + 9 * s);
+    c.quadraticCurveTo(x + w * 0.3, y + s, x + w * 0.55, y + 6 * s);
+    c.quadraticCurveTo(x + w * 0.72, y + s, x + w, y - up * 0.2);
+    c.quadraticCurveTo(x + w * 0.45, y - up, x, y + 3 * s);
+    c.fill();
+  }
+  function scene(name, list, alpha, dt, t) {
+    var i, p, c;
+    if (name === "christmas") for (i = 0; i < list.length; i++) {
+      p = list[i]; p.y += p.v * dt; if (p.y > 1210) { p.y = -10; p.x = rnd(0, 1340); }
+      c = p.front ? ff : fb;
+      c.globalAlpha = alpha * (p.front ? 0.92 : 0.22 + p.r / 8);
+      c.fillStyle = "#F3F3F1"; c.beginPath(); c.arc(p.x + Math.sin(t * 0.6 + p.ph) * 14, p.y, p.r, 0, 6.3); c.fill();
+    }
+    if (name === "carnaval") for (i = 0; i < list.length; i++) {
+      p = list[i]; p.y += p.v * dt; if (p.y > 1210) { p.y = -10; p.x = rnd(0, 1340); }
+      c = p.front ? ff : fb;
+      var sq = Math.cos(t * p.sp + p.ph);
+      c.globalAlpha = alpha * (p.front ? 0.95 : 0.5); c.fillStyle = p.c;
+      c.save(); c.translate(p.x + Math.sin(t * 0.9 + p.ph) * 22, p.y); c.rotate(t * p.sp * 0.4 + p.ph); c.fillRect(-p.w / 2, -p.h * sq / 2, p.w, p.h * sq); c.restore();
+    }
+    if (name === "halloween") {
+      var rise = (1 - alpha) * 90;
+      fb.globalAlpha = alpha; fb.fillStyle = "#E7E1D0"; fb.beginPath(); fb.arc(860, 520 + rise, 300, 0, 6.3); fb.fill();
+      fb.fillStyle = "#000";
+      for (i = 0; i < list.length; i++) {
+        p = list[i]; p.x += p.v * p.dir * dt;
+        if (p.dir > 0 && p.x > 1300) { p.x = 380; p.y = rnd(220, 600); }
+        if (p.dir < 0 && p.x < 380) { p.x = 1300; p.y = rnd(220, 600); }
+        bat(fb, p.x, p.y + Math.sin(t * 1.7 + p.ph) * 18, p.s, Math.sin(t * 9 + p.ph));
+      }
+    }
+  }
+  var fxIdle = false;
+  function drawFx(dt, now) {
+    var k = Math.min(1, (now - themeAt) / 900), fading = k < 1 && prevTheme && prevTheme !== "standard";
+    if (theme === "standard" && !fading) { if (!fxIdle) { fb.clearRect(0, 0, 1340, 1200); ff.clearRect(0, 0, 1340, 1200); fxIdle = true; } return; }
+    fxIdle = false;
+    fb.clearRect(0, 0, 1340, 1200); ff.clearRect(0, 0, 1340, 1200);
+    if (fading) scene(prevTheme, oldParts, 1 - k, dt, now / 1000);
+    scene(theme, parts, ease(k), dt, now / 1000);
+    fb.globalAlpha = 1; ff.globalAlpha = 1;
+  }
+
+  var nf = function (n) { return Math.round(n).toLocaleString("pt-BR"); };
+  function apply(s) {
+    state = s;
+    $("clock").textContent = s.clock; $("date").textContent = s.date;
+    $("temp").textContent = Math.round(s.outsideC) + "°";
+    $("soc").textContent = Math.round(s.soc) + "%"; $("socBar").style.width = s.soc + "%";
+    $("fuel").textContent = Math.round(s.fuelPct) + "%"; $("fuelBar").style.width = s.fuelPct + "%";
+    $("evr").textContent = nf(s.evRangeKm) + " km"; $("tr").textContent = nf(s.totalRangeKm) + " km";
+    $("cpState").innerHTML = s.carplay === "connected" ? '<i class="dot"></i>iPhone connected' : "Connect your iPhone";
+    $("brState").textContent = s.parked ? "YouTube and streaming" : "Available when parked";
+    document.querySelector('[data-app="browser"]').classList.toggle("wait", !s.parked);
+    if (s.windows && host) WIN.forEach(function (id) { if (typeof s.windows[id] === "number" && s.windows[id] !== win[id]) { win[id] = s.windows[id]; dirty = true; } });
+  }
+
+  var lastT = Date.now(), lastKey = "";
+  function frame() {
+    var now = Date.now(), dt = Math.min((now - lastT) / 1000, 0.1); lastT = now;
+    if (!view.dragging) {
+      if (view.t < 1) {
+        view.t = Math.min(1, view.t + dt / view.dur);
+        view.ang = view.from + (view.to - view.from) * ease(view.t); dirty = true;
+      } else if (view.vel) {
+        view.ang += view.vel * dt; view.vel *= Math.pow(0.03, dt); dirty = true;
+        if (Math.abs(view.vel) < 1.2) { view.vel = 0; view.ang = Math.round(view.ang); }
+      }
+    }
+    if (!host) WIN.forEach(function (id) {
+      var g = goal[id], v = win[id];
+      if (v !== g) { var st = 100 / WIN_SECONDS * dt; win[id] = g > v ? Math.min(g, v + st) : Math.max(g, v - st); dirty = true; }
+    });
+    var key = WIN.map(function (id) { return (win[id] > 99 ? 2 : win[id] < 1 ? 0 : 1) + ":" + goal[id]; }).join(",");
+    if (key !== lastKey) { lastKey = key; glassText(); }
+    if (dirty) { dirty = false; draw(); }
+    drawFx(dt, now);
+  }
+  var raf = window.requestAnimationFrame ? function () { frame(); requestAnimationFrame(raf); } : null;
+  if (raf) requestAnimationFrame(raf);
+  setInterval(function () { if (Date.now() - lastT > 120) frame(); }, 60);
+
+  function start() {
+    H.classList.remove("on", "live"); H.classList.add("intro"); void H.offsetWidth;
+    H.classList.remove("intro"); H.classList.add("on");
+    setTimeout(function () { H.classList.add("live"); }, 1900);
+    view.ang = HERO + N * 0.36; glide(HERO, 2.2);
+  }
+
+  window.KingHome = {
+    update: apply, start: start, setMode: applyMode,
+    setWindowPercent: function (id, pct) { if (id in win) { win[id] = pct; goal[id] = pct > 50 ? 100 : 0; dirty = true; } }
+  };
+
+  var DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  function demoState() {
+    var d = new Date();
+    return {
+      clock: ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2),
+      date: DAYS[d.getDay()] + ", " + d.getDate() + " " + MONTHS[d.getMonth()],
+      outsideC: 27, soc: 64, fuelPct: 72, evRangeKm: 59, totalRangeKm: 733, carplay: "connected", parked: true
+    };
+  }
+  if (!host) { apply(demoState()); setInterval(function () { apply(demoState()); }, 15000); }
+
+  var mq = /mode=(\w+)/.exec(q), wq = /open=([\w,]+)/.exec(q), aq = /ang=(\d+)/.exec(q);
+  applyMode(mq ? mq[1] : modePref, !!mq);
+  for (var i = 0; i < N; i++) { load("c", (HERO + i) % N); load("m", (HERO + i) % N); }
+  load("o", HERO);
+  start();
+  if (/still/.test(q)) { H.classList.add("live"); H.classList.add("still"); themeAt = 1; view.t = 1; view.ang = HERO; }
+  if (aq) { view.t = 1; view.ang = +aq[1]; }
+  if (wq) wq[1].split(",").forEach(function (id) { if (id in win) win[id] = goal[id] = 100; });
+})();
+</script>
