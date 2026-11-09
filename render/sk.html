@@ -26,12 +26,16 @@ client.init("c3bdefa332384e95a9fd249d0abb25c3", {
 window.setup = function (o) {
   return new Promise(function (res) {
     if (o.env) __api.setEnvironment(o.env, function () {});
+    if (o.fov) __api.setFov(o.fov, function () {});
+    if (o.lights) __api.setLightFeatureEnabled(true, function () {});
+    if (o.lights) o.lights.forEach(function (l) { __api.setLight(l[0], l[1], function () {}); });
     if (o.pp) __api.setPostProcessing(o.pp, function () {});
     if (o.bg) __api.setBackground({ color: o.bg }, function () {});
     __api.getMaterialList(function (err, mats) {
       var hits = [];
       mats.forEach(function (m) {
         var patch = (o.mats || {})[m.name];
+        if (o.snow) patch = { EmitColor: { enable: false, factor: 0 }, AlbedoPBR: { enable: true, color: [1, 1, 1], texture: undefined, factor: 1 }, DiffuseColor: { color: [1, 1, 1], texture: undefined }, Opacity: { enable: false }, SpecularF0: { factor: 0 }, MetalnessPBR: { factor: 0, texture: undefined }, RoughnessPBR: { factor: 1, texture: undefined }, GlossinessPBR: { factor: 0 }, ClearCoat: { enable: false }, NormalMap: { enable: false }, BumpMap: { enable: false }, AOPBR: { enable: false }, CavityPBR: { enable: false } };
         if (o.allWhite) patch = { EmitColor: { enable: true, factor: 1, color: [1, 1, 1] }, AlbedoPBR: { color: [1, 1, 1], texture: undefined }, Opacity: { enable: false }, DiffuseColor: { color: [1, 1, 1], texture: undefined } };
         if (o.blackExcept) { var c = o.blackExcept[m.name] || [0, 0, 0]; patch = { EmitColor: { enable: true, factor: 1, color: c }, AlbedoPBR: { color: [0, 0, 0], texture: undefined, factor: 0 }, DiffuseColor: { color: [0, 0, 0], texture: undefined }, Opacity: { enable: false }, SpecularF0: { factor: 0 }, MetalnessPBR: { factor: 0, texture: undefined }, RoughnessPBR: { factor: 1, texture: undefined }, GlossinessPBR: { factor: 0 }, ClearCoat: { enable: false }, SpecularPBR: { factor: 0 }, SpecularColor: { factor: 0 } }; }
         if (!patch) return;

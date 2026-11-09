@@ -82,6 +82,10 @@ body {
 
 .k .car { position: absolute; left: 725px; top: 238px; width: 250px; height: 207px; will-change: transform, opacity; }
 .k .car img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+.k[data-theme="halloween"] { --k-accent: #FF6A13; }
+.k[data-theme="christmas"] { --k-accent: #E5392C; }
+.k .car #c-snow { opacity: 0; transition: opacity 1.6s linear; }
+.k[data-theme="christmas"] .car #c-snow { opacity: 1; }
 .k .car .sig { opacity: 0; transition: opacity .09s linear; }
 .k .car .sig.on { opacity: 1; transition-duration: .03s; }
 .k .car .shadow { position: absolute; left: 8%; right: 8%; bottom: -10px; height: 34px; border-radius: 50%; background: radial-gradient(closest-side, rgba(0,0,0,.95), rgba(0,0,0,0)); }
@@ -114,6 +118,10 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
     <span class="sep" aria-hidden="true"></span>
     <button id="sc-start" type="button">Start car</button>
     <button id="sc-pause" type="button" aria-pressed="false">Pause</button>
+    <span class="sep" aria-hidden="true"></span>
+    <button type="button" data-th="standard" aria-pressed="true">Standard</button>
+    <button type="button" data-th="halloween" aria-pressed="false">Halloween</button>
+    <button type="button" data-th="christmas" aria-pressed="false">Christmas</button>
   </div>
 
   <div class="stage" id="stage">
@@ -122,6 +130,7 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
       <div class="car" id="car">
         <div class="shadow"></div>
         <img id="c-tail" alt="" src="{{img:king-tail.png}}">
+        <img id="c-snow" alt="" src="{{img:king-snow.png}}">
         <img id="c-lights" alt="" src="{{img:king-lights.png}}" style="opacity:0">
         <img id="c-turnL" class="sig" alt="" src="{{img:king-turnL.png}}">
         <img id="c-turnR" class="sig" alt="" src="{{img:king-turnR.png}}">
@@ -179,11 +188,64 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
   var roadFill = ctx.createLinearGradient(0, HY + 20, 0, 480);
   roadFill.addColorStop(0, "rgba(22,22,21,0)"); roadFill.addColorStop(0.45, "rgba(22,22,21,0.7)"); roadFill.addColorStop(1, "rgba(28,28,27,1)");
 
+  var theme = "standard", fxT = Date.now(), flakes = [], pumpkin = new Image();
+  pumpkin.src = "{{img:home/prop-pumpkin.webp}}";
+  var snowFill = ctx.createLinearGradient(0, HY + 10, 0, 480);
+  snowFill.addColorStop(0, "rgba(104,118,138,0)"); snowFill.addColorStop(0.4, "rgba(104,118,138,0.5)"); snowFill.addColorStop(1, "rgba(128,142,162,0.78)");
+  var nightFill = ctx.createLinearGradient(0, HY + 20, 0, 480);
+  nightFill.addColorStop(0, "rgba(16,24,30,0)"); nightFill.addColorStop(0.45, "rgba(16,24,30,0.75)"); nightFill.addColorStop(1, "rgba(22,30,36,1)");
+  var fogFill = ctx.createLinearGradient(0, HY - 30, 0, HY + 120);
+  fogFill.addColorStop(0, "rgba(74,98,112,0)"); fogFill.addColorStop(0.3, "rgba(74,98,112,0.5)"); fogFill.addColorStop(1, "rgba(74,98,112,0)");
+  for (var fi = 0; fi < 150; fi++) flakes.push({ X: Math.random() * 30 - 15, Y: Math.random() * 5, Z: 3 + Math.random() * 90, s: 0.6 + Math.random() });
+  function setTheme(name) {
+    theme = name === "halloween" || name === "christmas" ? name : "standard";
+    K.setAttribute("data-theme", theme);
+    Array.prototype.forEach.call(document.querySelectorAll("[data-th]"), function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-th") === theme ? "true" : "false"); });
+  }
+  function strip(X, hw, alpha, rgb, dist, reveal) {
+    for (var Z = ZC / 1.12; Z < 150; Z += 1.5) {
+      var u1 = ZC / Z, u2 = ZC / (Z + 1.5);
+      if (u1 < reveal) continue;
+      var a = alpha * smooth(0.035, 0.3, u2); if (a < 0.01) continue;
+      ctx.fillStyle = "rgba(" + rgb + "," + a.toFixed(3) + ")";
+      ctx.beginPath(); ctx.moveTo(sx(X - hw, u1), sy(u1)); ctx.lineTo(sx(X + hw, u1), sy(u1)); ctx.lineTo(sx(X + hw, u2), sy(u2)); ctx.lineTo(sx(X - hw, u2), sy(u2)); ctx.closePath(); ctx.fill();
+    }
+  }
+  function worldFx(dist, reveal) {
+    var now = Date.now(), dt = Math.min((now - fxT) / 1000, 0.1), v = shown.speed / 3.6, i; fxT = now;
+    if (theme === "christmas") {
+      strip(-0.8, 0.17, 0.5, "70,80,96", dist, reveal); strip(0.8, 0.17, 0.5, "70,80,96", dist, reveal);
+      ctx.fillStyle = "#F3F6FA";
+      for (i = 0; i < flakes.length; i++) {
+        var f = flakes[i]; f.Z -= (v * 0.85 + 3) * dt; f.Y -= 1.1 * dt; f.X += Math.sin(now / 900 + i) * 0.25 * dt;
+        if (f.Z < 2.2 || f.Y < 0) { f.Z = f.Z < 2.2 ? 60 + Math.random() * 35 : f.Z; f.Y = f.Y < 0 ? 4 + Math.random() * 1.5 : f.Y; f.X = Math.random() * 30 - 15; }
+        var u = ZC / f.Z; if (u < reveal) continue;
+        ctx.globalAlpha = 0.85 * smooth(0.04, 0.18, u);
+        ctx.beginPath(); ctx.arc(sx(f.X, u), sy(u) - KX * f.Y * u, Math.max(0.7, 0.035 * f.s * KX * u), 0, 6.3); ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    }
+    if (theme === "halloween") {
+      ctx.fillStyle = fogFill; ctx.fillRect(430, HY - 30, 850, 150);
+      if (pumpkin.complete && pumpkin.naturalWidth) for (i = 0; i < 6; i++) {
+        var Zp = ((i * 44 - dist) % 264 + 264) % 264 + 5, up = ZC / Zp, side = i % 2 ? 7.3 : -7.3;
+        if (up < Math.max(reveal, 0.045)) continue;
+        var hp = 0.5 * KX * up, wp = hp * pumpkin.naturalWidth / pumpkin.naturalHeight;
+        ctx.globalAlpha = smooth(0.045, 0.14, up);
+        ctx.drawImage(pumpkin, sx(side, up) - wp / 2, sy(up) - hp * 0.96, wp, hp);
+        ctx.globalCompositeOperation = "lighter"; ctx.globalAlpha *= 0.14 + 0.1 * Math.sin(now / 140 + i * 2);
+        ctx.drawImage(pumpkin, sx(side, up) - wp / 2, sy(up) - hp * 0.96, wp, hp);
+        ctx.globalCompositeOperation = "source-over";
+      }
+      ctx.globalAlpha = 1;
+    }
+  }
+
   function drawRoad(dist, egoX, reveal) {
     ctx.clearRect(0, 0, 1280, 480);
     var uMin = 0.035, uMax = 1.12;
     var e0 = -9 - egoX, e1 = 9 - egoX;
-    ctx.fillStyle = roadFill;
+    ctx.fillStyle = theme === "christmas" ? snowFill : theme === "halloween" ? nightFill : roadFill;
     ctx.beginPath();
     ctx.moveTo(sx(e0, uMax), sy(uMax)); ctx.lineTo(sx(e1, uMax), sy(uMax));
     ctx.lineTo(sx(e1, uMin), sy(uMin)); ctx.lineTo(sx(e0, uMin), sy(uMin)); ctx.closePath(); ctx.fill();
@@ -201,7 +263,7 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
       var step = 0.75;
       for (var Z = ZC / uMax; Z < 170; Z += step) {
         var Z2 = Z + step;
-        if (!outer) { var ph = ((Z + dist) % 12 + 12) % 12; if (ph > 4) continue; }
+        if (!outer) { if (theme === "christmas") continue; var ph = ((Z + dist) % 12 + 12) % 12; if (ph > 4) continue; }
         var u1 = ZC / Z, u2 = ZC / Z2;
         if (u1 < reveal) continue;
         var a = (outer ? 0.26 : 0.55) * smooth(uMin, 0.32, u2);
@@ -213,6 +275,7 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
         ctx.lineTo(sx(X + hw, u2), sy(u2)); ctx.lineTo(sx(X - hw, u2), sy(u2)); ctx.closePath(); ctx.fill();
       }
     }
+    worldFx(dist, reveal);
     ctx.globalCompositeOperation = "destination-out";
     ctx.fillStyle = leftFade; ctx.fillRect(0, 0, 600, 480);
     ctx.fillStyle = rightFade; ctx.fillRect(1170, 0, 110, 480);
@@ -276,7 +339,7 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
   }
   setInterval(frame, 33);
 
-  window.KingPanel = { update: apply, start: start };
+  window.KingPanel = { update: apply, start: start, setTheme: setTheme };
 
   var SCENES = {
     city: [[0, 0, "P"], [3, 0, "D"], [5, 28], [11, 46], [17, 48], [22, 0], [27, 0], [29, 34, 0, "L"], [36, 52], [43, 58], [48, 22], [52, 22, 0, "R"], [57, 0], [61, 0]],
@@ -336,6 +399,9 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
   if (!carMode || /demo/.test(hash)) { apply(step(0)); setInterval(tick, 50); }
   var seek = /t=(\d+)/.exec(location.search + location.hash);
   var sceneQ = /scene=(\w+)/.exec(location.search + location.hash);
+  var modeQ = /mode=(\w+)/.exec(location.search + location.hash);
+  if (modeQ) setTheme(modeQ[1]);
+  Array.prototype.forEach.call(document.querySelectorAll("[data-th]"), function (b) { b.addEventListener("click", function () { setTheme(b.getAttribute("data-th")); }); });
   if (sceneQ && SCENES[sceneQ[1]]) sim.scene = sceneQ[1];
   if (seek) { sim.t = +seek[1]; sim.speed = sceneAt(sim.scene, sim.t).speed; }
   start();

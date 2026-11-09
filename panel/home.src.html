@@ -37,10 +37,12 @@ body {
 .h * { box-sizing: border-box; }
 .h button { font: inherit; color: inherit; background: none; border: 0; padding: 0; margin: 0; cursor: pointer; text-align: left; letter-spacing: 0; }
 .h button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
-.h[data-theme="halloween"] { --accent: #FF6A13; }
-.h[data-theme="christmas"] { --accent: #E5392C; }
+.h[data-theme="halloween"] { --accent: #FF6A13; --dim: #B9C2C8; --track: rgba(255,255,255,0.22); }
+.h[data-theme="christmas"] { --accent: #FF5A4D; --dim: #D2D6DC; --track: rgba(255,255,255,0.26); }
 .h[data-theme="carnaval"] { --accent: #F4C21B; }
 
+.h .plate { position: absolute; left: 0; top: 0; width: 1360px; height: 1200px; background-size: cover; background-position: center; opacity: 0; transition: opacity .7s var(--ease); }
+.h .plate.on { opacity: 1; }
 .h .fx { position: absolute; left: 0; top: 0; width: 1360px; height: 1200px; pointer-events: none; transition: opacity .32s linear; }
 .h .railbg { position: absolute; left: 1356px; top: 0; width: 564px; height: 1200px; background: #000; }
 .h .tag { position: absolute; left: 0; top: 0; display: flex; flex-direction: column; align-items: center; opacity: 0; pointer-events: none; transition: opacity .35s var(--ease); will-change: transform; }
@@ -63,22 +65,18 @@ body {
 .h .carbox.drag { cursor: grabbing; }
 .h .carbox canvas { display: block; width: 100%; }
 
-.h .glass { position: absolute; left: 72px; top: 874px; display: flex; align-items: baseline; gap: 30px; font-size: 26px; }
-.h .glass p { margin: 0; min-width: 330px; }
-.h .glass button { color: var(--ink); padding: 12px 0; border-bottom: 1px solid var(--faint); transition: border-color .3s var(--ease); }
+.h .glass { position: absolute; left: 892px; top: 1028px; width: 400px; display: flex; flex-direction: column; align-items: flex-end; font-size: 26px; }
+.h .glass p { margin: 0; color: var(--dim); font-size: 22px; }
+.h .glass button { margin-top: 2px; color: var(--ink); font-size: 46px; line-height: 1; padding: 8px 0 14px; border-bottom: 3px solid var(--track); transition: border-color .3s var(--ease); }
 .h .glass button:active { border-bottom-color: var(--accent); }
 
-.h .stats { position: absolute; left: 72px; top: 958px; display: flex; gap: 64px; }
+.h .stats { position: absolute; left: 72px; top: 1028px; display: flex; gap: 64px; }
 .h .stat { width: 190px; }
 .h .stat span { display: block; font-size: 22px; color: var(--dim); }
 .h .stat b { display: block; margin-top: 8px; font-size: 46px; line-height: 1; font-weight: 400; }
 .h .stat i { display: block; margin-top: 16px; height: 3px; border-radius: 2px; background: var(--track); position: relative; overflow: hidden; }
 .h .stat i u { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--ink); border-radius: 2px; transition: width .9s var(--ease); }
 .h .stat.fuel i u { background: var(--accent); }
-
-.h .modes { position: absolute; left: 72px; top: 1098px; display: flex; gap: 34px; font-size: 22px; }
-.h .modes button { color: var(--faint); padding: 14px 0 10px; border-bottom: 2px solid transparent; transition: color .3s var(--ease), border-color .3s var(--ease); }
-.h .modes button[aria-pressed="true"] { color: var(--ink); border-bottom-color: var(--accent); }
 
 .h .rail { position: absolute; left: 1380px; top: 60px; width: 468px; height: 1080px; display: flex; flex-direction: column; }
 .h .app { position: relative; display: flex; flex-direction: column; justify-content: center; width: 100%; flex: 1; padding: 0 6px; border-top: 1px solid var(--hair); transition: background-color .2s var(--ease), opacity .4s var(--ease); }
@@ -94,15 +92,33 @@ body {
 .h .app.main + .app { border-top-color: transparent; }
 .h .app.wait b { color: var(--faint); }
 
-.h .toast { position: absolute; right: 628px; bottom: 50px; transform: translateY(16px); background: var(--ink); color: #0A0A0A; font-size: 24px; padding: 18px 26px; border-radius: 14px; opacity: 0; pointer-events: none; transition: opacity .35s var(--ease), transform .35s var(--ease); }
-.h .toast.on { opacity: 1; transform: none; }
+.h .toast { position: absolute; left: 676px; bottom: 214px; transform: translate(-50%, 16px); white-space: nowrap; background: var(--ink); color: #0A0A0A; font-size: 24px; padding: 18px 26px; border-radius: 14px; opacity: 0; pointer-events: none; transition: opacity .35s var(--ease), transform .35s var(--ease); }
+.h .toast.on { opacity: 1; transform: translate(-50%, 0); }
 
-.h .time, .h .out, .h .glass, .h .stats, .h .modes, .h .rail > * { transition-property: opacity, transform, background-color; transition-duration: .9s, .9s, .2s; transition-timing-function: var(--ease); }
+.h .set { position: absolute; left: 0; top: 0; width: 1920px; height: 1200px; background: #000; padding: 56px 72px; transform: translateX(100%); visibility: hidden; transition: transform .55s var(--ease), visibility 0s linear .55s; }
+.h.setopen .set { transform: none; visibility: visible; transition: transform .55s var(--ease), visibility 0s; }
+.h .set .back { font-size: 26px; color: var(--dim); padding: 12px 0; }
+.h .set h2 { margin: 18px 0 0; font-size: 96px; line-height: 1; font-weight: 300; margin-left: -4px; }
+.h .set h3 { margin: 64px 0 22px; font-size: 24px; font-weight: 400; color: var(--dim); }
+.h .set .themes { display: flex; gap: 24px; }
+.h .set .th { width: 336px; }
+.h .set .th i { display: flex; align-items: flex-end; width: 336px; height: 210px; border-radius: 20px; background: #0F0F0F center / cover; border: 2px solid transparent; padding: 18px 20px; font-style: normal; font-size: 44px; font-weight: 300; color: var(--ink); transition: border-color .25s var(--ease), transform .25s var(--ease); }
+.h .set .th:active i { transform: scale(0.98); }
+.h .set .th[aria-pressed="true"] i { border-color: var(--accent); }
+.h .set .th b { display: block; margin-top: 16px; font-size: 30px; font-weight: 400; }
+.h .set .th span { display: block; margin-top: 6px; font-size: 22px; color: var(--dim); }
+.h .set .rows { width: 1056px; }
+.h .set .row { display: flex; justify-content: space-between; align-items: baseline; width: 100%; padding: 26px 0; border-top: 1px solid var(--hair); }
+.h .set .row b { font-size: 34px; font-weight: 400; transition: transform .25s var(--ease); }
+.h .set .row span { font-size: 24px; color: var(--dim); }
+.h .set .row:active b { transform: translateX(10px); }
+
+.h .time, .h .out, .h .glass, .h .stats, .h .rail > * { transition-property: opacity, transform, background-color; transition-duration: .9s, .9s, .2s; transition-timing-function: var(--ease); }
 .h.intro .time, .h.intro .out, .h.intro .glass, .h.intro .stats, .h.intro .modes { opacity: 0; transform: translateY(10px); transition: none; }
 .h.intro .rail > * { opacity: 0; transform: translateX(22px); transition: none; }
 .h.on .rail > *:nth-child(1) { transition-delay: .25s, .25s, 0s; } .h.on .rail > *:nth-child(2) { transition-delay: .33s, .33s, 0s; }
 .h.on .rail > *:nth-child(3) { transition-delay: .41s, .41s, 0s; } .h.on .rail > *:nth-child(4) { transition-delay: .49s, .49s, 0s; }
-.h.on .glass { transition-delay: .55s, .55s, 0s; } .h.on .stats { transition-delay: .65s, .65s, 0s; } .h.on .modes { transition-delay: .75s, .75s, 0s; }
+.h.on .glass { transition-delay: .55s, .55s, 0s; } .h.on .stats { transition-delay: .65s, .65s, 0s; }
 .h.live .rail > *, .h.live .time, .h.live .out, .h.live .glass, .h.live .stats, .h.live .modes { transition-delay: 0s; transition-duration: .25s; }
 
 .h.still, .h.still * { transition: none !important; }
@@ -121,6 +137,8 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
 
   <div class="stage" id="stage">
     <div class="h intro" id="h" data-theme="standard">
+      <div class="plate" id="plateA"></div>
+      <div class="plate" id="plateB"></div>
       <canvas class="fx" id="fxBack" width="1360" height="1200"></canvas>
 
       <div class="time"><b id="clock">00:00</b><span id="date"></span><em id="greet"></em></div>
@@ -147,21 +165,31 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
         <div class="stat"><span>Total range</span><b id="tr">0 km</b></div>
       </div>
 
-      <div class="modes" role="group" aria-label="Theme">
-        <button type="button" data-mode="auto" aria-pressed="true">Auto</button>
-        <button type="button" data-mode="standard" aria-pressed="false">Standard</button>
-        <button type="button" data-mode="halloween" aria-pressed="false">Halloween</button>
-        <button type="button" data-mode="christmas" aria-pressed="false">Christmas</button>
-        <button type="button" data-mode="carnaval" aria-pressed="false">Carnaval</button>
-      </div>
-
       <div class="rail">
         <button type="button" class="app main" data-app="carplay"><b>CarPlay</b><span id="cpState"></span></button>
         <button type="button" class="app" data-app="nav"><b>Navigation</b><span>Maps and routes</span></button>
         <button type="button" class="app" data-app="browser"><b>Browser</b><span id="brState">YouTube and streaming</span></button>
-        <button type="button" class="app" data-app="settings"><b>Settings</b><span>Car and display</span></button>
+        <button type="button" class="app" id="openSet"><b>Settings</b><span>Themes and car settings</span></button>
       </div>
 
+      <div class="set" id="set">
+        <button type="button" class="back" id="setBack">Back</button>
+        <h2>Settings</h2>
+        <h3>Theme</h3>
+        <div class="themes" role="group" aria-label="Theme">
+          <button type="button" class="th" data-mode="auto" aria-pressed="true"><i id="autoDay"></i><b>Auto</b><span>Follows the calendar</span></button>
+          <button type="button" class="th" data-mode="standard" aria-pressed="false"><i style="background-image:url({{img:home/thumb-standard.webp}})"></i><b>Studio</b><span>Every day</span></button>
+          <button type="button" class="th" data-mode="halloween" aria-pressed="false"><i style="background-image:url({{img:home/thumb-halloween.webp}})"></i><b>Halloween</b><span>Last week of October</span></button>
+          <button type="button" class="th" data-mode="christmas" aria-pressed="false"><i style="background-image:url({{img:home/thumb-christmas.webp}})"></i><b>Christmas</b><span>December until the 26th</span></button>
+          <button type="button" class="th" data-mode="carnaval" aria-pressed="false"><i style="background-image:url({{img:home/thumb-carnaval.webp}})"></i><b>Carnaval</b><span>The days of Carnaval</span></button>
+        </div>
+        <h3>Displays</h3>
+        <div class="rows">
+          <button type="button" class="row" id="rowCluster"><b>Driver display</b><span id="clusterState">Custom design on</span></button>
+          <button type="button" class="row" data-app="settings"><b>Car settings</b><span>Open BYD settings</span></button>
+          <button type="button" class="row" data-app="bydhome"><b>BYD home screen</b><span>Go back to the original home</span></button>
+        </div>
+      </div>
       <div class="toast" id="toast" role="status"></div>
     </div>
   </div>
@@ -193,14 +221,13 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
   var NAMES = { fl: "Front left", fr: "Front right", rl: "Rear left", rr: "Rear right" };
   var cv = $("car"), ctx = cv.getContext("2d");
   cv.width = FW; cv.height = FH;
-  $("carbox").style.top = Math.round(256 + (600 - FH) / 2) + "px";
   var tmp = document.createElement("canvas"); tmp.width = FW; tmp.height = FH;
   var tctx = tmp.getContext("2d");
   var MW = Math.round(FW * MS), MH = Math.round(FH * MS);
   var mcv = document.createElement("canvas"); mcv.width = MW; mcv.height = MH;
   var mctx = mcv.getContext("2d", { willReadFrequently: true });
 
-  var imgs = { c: [], o: [], m: [], e: [] }, dirty = true;
+  var imgs = { c: [], o: [], m: [], e: [], n: [] }, dirty = true;
   function load(key, i) {
     var arr = imgs[key];
     if (!arr[i]) { var im = new Image(); arr[i] = im; im.onload = function () { dirty = true; }; im.src = FR[i][key]; }
@@ -245,7 +272,11 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
   function ease(t) { return 1 - Math.pow(1 - t, 4); }
   function glide(to, dur) { view.from = view.ang; view.to = to; view.t = 0; view.dur = dur; view.vel = 0; }
 
+  var snowLevel = 0;
   function lit() {
+    var S = SCENES[theme];
+    if (S && S.tint) { ctx.globalCompositeOperation = "source-atop"; ctx.fillStyle = S.tint; ctx.fillRect(0, 0, FW, FH); ctx.globalCompositeOperation = "source-over"; }
+    if (snowLevel > 0.01) { var sn = load("n", shownIdx); if (ready(sn)) { ctx.globalAlpha = snowLevel; ctx.drawImage(sn, 0, 0, FW, FH); ctx.globalAlpha = 1; } else dirty = true; }
     if (lights.level < 0.01) return;
     var e = load("e", shownIdx);
     if (!ready(e)) { dirty = true; return; }
@@ -352,7 +383,7 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
     var t = $("toast"); t.textContent = msg; t.classList.add("on");
     clearTimeout(toastT); toastT = setTimeout(function () { t.classList.remove("on"); }, 2600);
   }
-  var APP_NAMES = { carplay: "CarPlay", nav: "Navigation", browser: "The browser", settings: "Settings" };
+  var APP_NAMES = { carplay: "CarPlay", nav: "Navigation", browser: "The browser", settings: "BYD settings", bydhome: "The BYD home screen" };
   var state = null;
   Array.prototype.forEach.call(document.querySelectorAll("[data-app]"), function (b) {
     b.addEventListener("click", function () {
@@ -389,43 +420,67 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
     var next = pref === "auto" ? autoTheme(new Date()) : pref;
     if (next === (pending || theme)) return;
     var first = !theme, g = $("greet");
-    function swap() { pending = ""; theme = next; parts = seed(theme); H.setAttribute("data-theme", theme); g.textContent = GREET[theme]; g.style.opacity = 1; fbc.style.opacity = 1; ffc.style.opacity = 1; }
+    function swap() {
+      pending = ""; theme = next; parts = seed(theme); H.setAttribute("data-theme", theme); g.textContent = GREET[theme]; g.style.opacity = 1; fbc.style.opacity = 1; ffc.style.opacity = 1; dirty = true;
+      var S = SCENES[theme], a = $("plateA"), b = $("plateB"), top = a.classList.contains("on") ? b : a, old = top === a ? b : a;
+      if (host && host.setTheme) host.setTheme(theme);
+      if (S.plate) { top.style.backgroundImage = "url(" + S.plate + ")"; top.classList.add("on"); }
+      old.classList.remove("on");
+    }
     if (first) { swap(); return; }
     pending = next;
     g.style.opacity = 0; fbc.style.opacity = 0; ffc.style.opacity = 0;
     clearTimeout(swapT); swapT = setTimeout(swap, 340);
   }
   Array.prototype.forEach.call(document.querySelectorAll("[data-mode]"), function (b) {
-    b.addEventListener("click", function () { applyMode(b.getAttribute("data-mode")); });
+    b.addEventListener("click", function () { applyMode(b.getAttribute("data-mode")); setTimeout(function () { H.classList.remove("setopen"); }, 320); });
+  });
+  $("openSet").addEventListener("click", function () { H.classList.add("setopen"); });
+  $("setBack").addEventListener("click", function () { H.classList.remove("setopen"); });
+  var clusterOn = true;
+  $("rowCluster").addEventListener("click", function () {
+    clusterOn = !clusterOn; $("clusterState").textContent = clusterOn ? "Custom design on" : "BYD original";
+    if (host && host.setCluster) host.setCluster(clusterOn);
   });
 
   var fbc = $("fxBack"), ffc = $("fxFront"), fb = fbc.getContext("2d"), ff = ffc.getContext("2d");
-  var CAM = {{cam}}, CX = 36, CY = Math.round(256 + (600 - FH) / 2);
+  var CAM = {{cam}}, CX = CAM.cx - (800 - CAM.box[0]) * CAM.sc, CY = CAM.cy - (500 - CAM.box[1]) * CAM.sc;
+  box.style.left = CX + "px"; box.style.top = CY + "px"; box.style.width = FW + "px";
   function camAt(idx) {
-    var a = idx * 6.283185 / N, ce = Math.cos(CAM.el), se = Math.sin(CAM.el);
-    var p = [CAM.r * ce * Math.sin(a), -CAM.r * ce * Math.cos(a), CAM.tz + CAM.r * se];
+    var a = idx * 6.283185 / N, p = [CAM.dist * Math.sin(a), -CAM.dist * Math.cos(a), CAM.hc];
     var f = [-p[0], -p[1], CAM.tz - p[2]], l = Math.sqrt(f[0] * f[0] + f[1] * f[1] + f[2] * f[2]);
     f = [f[0] / l, f[1] / l, f[2] / l];
-    var r = [f[1], -f[0], 0], rl = Math.sqrt(r[0] * r[0] + r[1] * r[1]); r = [r[0] / rl, r[1] / rl, 0];
-    return { p: p, f: f, r: r, u: [r[1] * f[2], -r[0] * f[2], r[0] * f[1] - r[1] * f[0]] };
+    var rl = Math.sqrt(f[0] * f[0] + f[1] * f[1]), r = [f[1] / rl, -f[0] / rl, 0];
+    return { p: p, f: f, r: r, u: [r[1] * f[2], -r[0] * f[2], r[0] * f[1] - r[1] * f[0]], h: [f[0] / rl, f[1] / rl] };
   }
   var camNow = camAt(0), camIdx = -1, camStage = null;
+  function P(x, y, z) {
+    var c = camNow, dx = x - c.p[0], dy = y - c.p[1], dz = z - c.p[2];
+    var w = dx * c.f[0] + dy * c.f[1] + dz * c.f[2], k = CAM.f / w;
+    return [CAM.cx + (dx * c.r[0] + dy * c.r[1]) * k, CAM.cy - (dx * c.u[0] + dy * c.u[1] + dz * c.u[2]) * k, w];
+  }
   function PS(sx, sd, h) {
-    var keep = camNow; camNow = camStage;
-    var c = camStage, q = P(sx * c.r[0] - sd * c.f[0] * 1.0125, sx * c.r[1] - sd * c.f[1] * 1.0125, h);
+    var keep = camNow, c = camStage; camNow = c;
+    var q = P(sx * c.r[0] - sd * c.h[0], sx * c.r[1] - sd * c.h[1], h);
     camNow = keep; return q;
   }
-  function P(x, y, z) {
-    var c = camNow, dx = x * 0.01 - c.p[0], dy = y * 0.01 - c.p[1], dz = CAM.zg + z * 0.01 - c.p[2];
-    var w = dx * c.f[0] + dy * c.f[1] + dz * c.f[2], k = 500 / CAM.tf / w;
-    return [CX + (800 + (dx * c.r[0] + dy * c.r[1]) * k - CAM.box[0]) * CAM.sc, CY + (500 - (dx * c.u[0] + dy * c.u[1] + dz * c.u[2]) * k - CAM.box[1]) * CAM.sc, w];
+  function depth(q) { var c = camNow; return (q[0] - c.p[0]) * c.f[0] + (q[1] - c.p[1]) * c.f[1] - c.p[2] * c.f[2]; }
+  function groundPath(c, pts) {
+    var out = [], n = pts.length, NEAR = 2.2, i;
+    for (i = 0; i < n; i++) {
+      var a = pts[i], b = pts[(i + 1) % n], da = depth(a) - NEAR, db = depth(b) - NEAR;
+      if (da >= 0) out.push(a);
+      if ((da >= 0) !== (db >= 0)) { var t = da / (da - db); out.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]); }
+    }
+    c.beginPath();
+    for (i = 0; i < out.length; i++) { var q = P(out[i][0], out[i][1], 0); if (i) c.lineTo(q[0], q[1]); else c.moveTo(q[0], q[1]); }
+    c.closePath();
   }
-  function groundPath(c, pts) { c.beginPath(); for (var i = 0; i < pts.length; i++) { var q = P(pts[i][0], pts[i][1], 0); if (i) c.lineTo(q[0], q[1]); else c.moveTo(q[0], q[1]); } c.closePath(); }
   function circle(r, n) { var o = []; for (var i = 0; i < n; i++) o.push([Math.cos(i * 6.283185 / n) * r, Math.sin(i * 6.283185 / n) * r]); return o; }
   var FOOT = (function () { var o = []; for (var i = 0; i < 40; i++) { var t = i * 6.283185 / 40, c = Math.cos(t), s = Math.sin(t); o.push([0.96 * (c < 0 ? -1 : 1) * Math.pow(Math.abs(c), 0.5), 2.44 * (s < 0 ? -1 : 1) * Math.pow(Math.abs(s), 0.5)]); } return o; })();
   function pool(rgb, radius, strength) {
-    var o = P(0, 0, 0), a = P(camNow.r[0] * radius, camNow.r[1] * radius, 0), b = P(-camNow.f[0] * radius, -camNow.f[1] * radius, 0);
-    var rx = Math.abs(a[0] - o[0]), ry = Math.abs(b[1] - o[1]);
+    var c = camNow, o = P(0, 0, 0), a = P(c.r[0] * radius, c.r[1] * radius, 0), b = P(c.h[0] * radius, c.h[1] * radius, 0);
+    var rx = Math.abs(a[0] - o[0]), ry = Math.abs(b[1] - o[1]) * 2.1;
     fb.save(); fb.translate(o[0], o[1]); fb.scale(1, ry / rx);
     var g = fb.createRadialGradient(0, 0, 0, 0, 0, rx);
     g.addColorStop(0, "rgba(" + rgb + "," + strength + ")"); g.addColorStop(0.45, "rgba(" + rgb + "," + (strength * 0.62).toFixed(3) + ")"); g.addColorStop(1, "rgba(" + rgb + ",0)");
@@ -434,9 +489,9 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
   function shadow(pts, strength, grow) {
     fb.fillStyle = "#000";
     for (var k = 0; k < 9; k++) {
-      var s = 1 + grow - k * grow / 5;
-      fb.globalAlpha = strength / 5;
-      groundPath(fb, pts.map(function (q) { return [q[0] * s, q[1] * s]; })); fb.fill();
+      var sc = 1 + grow - k * grow / 5;
+      fb.globalAlpha = Math.min(1, strength / 5);
+      groundPath(fb, pts.map(function (q) { return [q[0] * sc, q[1] * sc]; })); fb.fill();
     }
     fb.globalAlpha = 1;
   }
@@ -448,10 +503,10 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
   var CONF = ["#F4C21B", "#2FA35B", "#E5392C", "#2E7BE3", "#F3F3F1", "#E052A0"];
   function rnd(a, b) { return a + Math.random() * (b - a); }
   var SCENES = {
-    standard: { pool: ["34,34,33", 6.4], props: [] },
-    halloween: { pool: ["46,31,16", 6], props: [["pumpkin", 1.62, 3.7, 0.52, 1], ["pumpkin", 1.2, 4.6, 0.34, 1], ["pumpkin", 1.88, 4.75, 0.42, 1], ["pumpkin", 2.25, -3.9, 0.44, 1], ["pumpkin", -2.3, -1.9, 0.4, 1]] },
-    christmas: { pool: ["150,160,170", 5.4], props: [["plaid", 1.62, 3.7, 0.5], ["red", 1.2, 4.6, 0.34], ["red", 1.9, 4.8, 0.42], ["pine", 2.12, -4.6, 1.3], ["pine", 1.5, -7.2, 0.95], ["pine", -2.28, -2.2, 0.8]] },
-    carnaval: { pool: ["44,38,22", 6.4], props: [] }
+    standard: { pool: ["64,64,62", 9], shadow: 0.8, props: [] },
+    halloween: { plate: "{{img:home/plate-halloween.webp}}", shadow: 0.9, tint: "rgba(8,22,38,0.34)", props: [["pumpkin", 2.45, -1.3, 0.5, 1], ["pumpkin", 3.05, -1.9, 0.34, 1], ["pumpkin", 2.8, -3.5, 0.42, 1], ["pumpkin", -2.75, 0.4, 0.44, 1], ["pumpkin", -2.25, 1.5, 0.3, 1], ["pumpkin", -3.3, -7.5, 0.44, 1], ["pumpkin", 4.4, -11, 0.44, 1]] },
+    christmas: { plate: "{{img:home/plate-christmas.webp}}", shadow: 1.15, tint: "rgba(70,100,170,0.10)", snow: 1, props: [] },
+    carnaval: { pool: ["72,60,30", 9], shadow: 0.8, props: [] }
   };
   function seed(name) {
     var out = [], i;
@@ -460,7 +515,7 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
       for (i = 0; i < 110; i++) out.push({ x: rnd(0, 1360), y: rnd(-1200, 1200), w: rnd(9, 17), h: rnd(5, 9), v: rnd(60, 150), ph: rnd(0, 6.3), sp: rnd(1.5, 4), c: CONF[i % 6], front: i % 4 === 0 });
       for (i = 0; i < 260; i++) { var a = rnd(0, 6.3), r = 1.2 + 6.5 * Math.sqrt(Math.random()); out.push({ g: 1, x: Math.cos(a) * r, y: Math.sin(a) * r, s: rnd(0.03, 0.07), ph: rnd(0, 3.1), c: CONF[i % 6] }); }
     }
-    if (name === "halloween") for (i = 0; i < 6; i++) out.push({ x: rnd(300, 1300), y: rnd(220, 600), v: rnd(60, 120), s: rnd(0.8, 1.7), ph: rnd(0, 6.3), dir: i % 2 ? 1 : -1 });
+    if (name === "halloween") for (i = 0; i < 5; i++) out.push({ x: rnd(0, 1360), y: rnd(150, 430), v: rnd(26, 60), s: rnd(0.35, 0.75), ph: rnd(0, 6.3), dir: i % 2 ? 1 : -1 });
     return out;
   }
   function bat(c, x, y, s, flap) {
@@ -480,13 +535,17 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
     if (camIdx !== shownIdx && shownIdx >= 0) { camIdx = shownIdx; camNow = camAt(camIdx); }
     if (!camStage) camStage = camAt(HERO);
     fb.clearRect(0, 0, 1360, 1200); ff.clearRect(0, 0, 1360, 1200);
-    if (theme === "halloween") { fb.fillStyle = "#E7E1D0"; fb.beginPath(); fb.arc(880, 470, 290, 0, 6.3); fb.fill(); }
-    pool(S.pool[0], S.pool[1], 1);
+    if (S.pool) pool(S.pool[0], S.pool[1], 1);
     if (theme === "standard") {
-      fb.strokeStyle = "#343433"; fb.lineWidth = 1.5; groundPath(fb, circle(3.55, 96)); fb.stroke();
-      fb.beginPath();
-      for (i = 0; i < 72; i++) { var a = i * 6.283185 / 72, r1 = i % 18 === 0 ? 3.95 : i % 6 === 0 ? 3.78 : 3.66, q0 = P(Math.cos(a) * 3.55, Math.sin(a) * 3.55, 0), q1 = P(Math.cos(a) * r1, Math.sin(a) * r1, 0); fb.moveTo(q0[0], q0[1]); fb.lineTo(q1[0], q1[1]); }
-      fb.stroke();
+      fb.strokeStyle = "#3A3A38"; fb.lineWidth = 1.5;
+      for (i = 0; i < 144; i++) {
+        var a = i * 6.283185 / 144, a2 = (i + 1) * 6.283185 / 144, q0 = P(Math.cos(a) * 3.3, Math.sin(a) * 3.3, 0), q2 = P(Math.cos(a2) * 3.3, Math.sin(a2) * 3.3, 0);
+        fb.globalAlpha = Math.max(0, Math.min(1, (1000 - q0[1]) / 110));
+        fb.beginPath(); fb.moveTo(q0[0], q0[1]); fb.lineTo(q2[0], q2[1]);
+        if (i % 4 === 0) { var r1 = i % 36 === 0 ? 3.66 : i % 12 === 0 ? 3.5 : 3.4, q1 = P(Math.cos(a) * r1, Math.sin(a) * r1, 0); fb.moveTo(q0[0], q0[1]); fb.lineTo(q1[0], q1[1]); }
+        fb.stroke();
+      }
+      fb.globalAlpha = 1;
     }
     if (theme === "carnaval") for (i = 0; i < parts.length; i++) {
       p = parts[i]; if (!p.g) continue;
@@ -495,14 +554,14 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
       groundPath(fb, [[p.x - cs, p.y - sn], [p.x - sn * 0.5, p.y + cs * 0.5], [p.x + cs, p.y + sn], [p.x + sn * 0.5, p.y - cs * 0.5]]); fb.fill();
     }
     fb.globalAlpha = 1;
-    shadow(FOOT, theme === "christmas" ? 0.62 : 0.8, 0.16);
+    shadow(FOOT, S.shadow, 0.14);
     if (theme === "halloween") {
-      fb.fillStyle = "#000";
+      fb.fillStyle = "#05080B";
       for (i = 0; i < parts.length; i++) {
         p = parts[i]; p.x += p.v * p.dir * dt;
-        if (p.dir > 0 && p.x > 1300) { p.x = 380; p.y = rnd(220, 600); }
-        if (p.dir < 0 && p.x < 380) { p.x = 1300; p.y = rnd(220, 600); }
-        bat(fb, p.x, p.y + Math.sin(t * 1.7 + p.ph) * 18, p.s, Math.sin(t * 9 + p.ph));
+        if (p.dir > 0 && p.x > 1400) { p.x = -40; p.y = rnd(150, 430); }
+        if (p.dir < 0 && p.x < -40) { p.x = 1400; p.y = rnd(150, 430); }
+        bat(fb, p.x, p.y + Math.sin(t * 1.3 + p.ph) * 10, p.s, Math.sin(t * 8 + p.ph));
       }
     }
     var list = S.props.map(function (pr) { return { pr: pr, b: PS(pr[1], pr[2], 0), top: PS(pr[1], pr[2], pr[3]) }; });
@@ -512,11 +571,12 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
       if (!ready(im)) continue;
       var hpx = it.b[1] - it.top[1], wpx = hpx * im.naturalWidth / im.naturalHeight;
       c = it.pr[2] < 0 ? fb : ff;
-      c.fillStyle = "#000"; c.globalAlpha = 0.2;
+      var fog = Math.max(0.25, Math.min(1, 1 + it.pr[2] / 34));
+      c.fillStyle = "#000"; c.globalAlpha = 0.24 * fog;
       for (q = 0; q < 3; q++) { c.beginPath(); c.ellipse(it.b[0], it.b[1] - hpx * 0.03, wpx * (0.36 + q * 0.1), wpx * (0.36 + q * 0.1) * 0.17, 0, 0, 6.3); c.fill(); }
-      c.globalAlpha = 1;
+      c.globalAlpha = fog;
       c.drawImage(im, it.b[0] - wpx / 2, it.b[1] - hpx * 0.97, wpx, hpx);
-      if (it.pr[4]) { c.globalCompositeOperation = "lighter"; c.globalAlpha = 0.1 + 0.1 * Math.sin(t * 7 + i * 2.1) * Math.sin(t * 2.3 + i); c.drawImage(im, it.b[0] - wpx / 2, it.b[1] - hpx * 0.97, wpx, hpx); c.globalCompositeOperation = "source-over"; c.globalAlpha = 1; }
+      if (it.pr[4]) { c.globalCompositeOperation = "lighter"; c.globalAlpha = fog * (0.12 + 0.1 * Math.sin(t * 7 + i * 2.1) * Math.sin(t * 2.3 + i)); c.drawImage(im, it.b[0] - wpx / 2, it.b[1] - hpx * 0.97, wpx, hpx); c.globalCompositeOperation = "source-over"; c.globalAlpha = 1; }
     }
     if (theme === "christmas") for (i = 0; i < parts.length; i++) {
       p = parts[i]; p.y += p.v * dt; if (p.y > 1210) { p.y = -10; p.x = rnd(0, 1360); }
@@ -568,14 +628,15 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
     }
     tg = tags.lights;
     var a = shownIdx * 6.283185 / N, front = calm && shownIdx >= 0 && Math.cos(a) > 0.25;
-    if (front) { var q = P(Math.sin(a) > 0 ? 0.72 : -0.72, -2.2, 0.66); tg.el.style.transform = "translate(" + Math.round(q[0]) + "px," + Math.round(q[1]) + "px) translate(-50%,0)"; tg.line.style.height = "104px"; }
+    if (front) { var q = P(Math.sin(a) > 0 ? 0.72 : -0.72, -2.2, 0.66); tg.el.style.transform = "translate(" + Math.round(q[0]) + "px," + Math.round(q[1]) + "px) translate(-50%,0)"; tg.line.style.height = "96px"; }
     if (front !== tg.on) { tg.on = front; tg.el.classList.toggle("on", front); }
   }
 
   var nf = function (n) { return Math.round(n).toLocaleString("pt-BR"); };
   function apply(s) {
     state = s;
-    $("clock").textContent = s.clock; $("date").textContent = s.date;
+    $("clock").textContent = s.clock; $("date").textContent = s.date; $("autoDay").textContent = s.day || "";
+    if (typeof s.cluster === "boolean" && s.cluster !== clusterOn) { clusterOn = s.cluster; $("clusterState").textContent = clusterOn ? "Custom design on" : "BYD original"; }
     $("temp").textContent = Math.round(s.outsideC) + "°";
     $("soc").textContent = Math.round(s.soc) + "%"; $("socBar").style.width = s.soc + "%";
     $("fuel").textContent = Math.round(s.fuelPct) + "%"; $("fuelBar").style.width = s.fuelPct + "%";
@@ -605,6 +666,8 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
     var key = WIN.map(function (id) { return (win[id] > 99 ? 2 : win[id] < 1 ? 0 : 1) + ":" + goal[id]; }).join(",");
     if (key !== lastKey) { lastKey = key; glassText(); }
     stepLights(dt, now);
+    var sg = SCENES[theme] && SCENES[theme].snow ? 1 : 0;
+    if (snowLevel !== sg) { snowLevel += (sg > snowLevel ? 1 : -1) * Math.min(Math.abs(sg - snowLevel), dt * (sg ? 0.45 : 2.5)); dirty = true; }
     if (dirty) { dirty = false; draw(); }
     var calm = !view.dragging && !view.vel && view.t >= 1 && introDone;
     placeTags(calm);
@@ -635,7 +698,7 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
     var d = new Date();
     return {
       clock: ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2),
-      date: DAYS[d.getDay()] + ", " + d.getDate() + " " + MONTHS[d.getMonth()],
+      date: DAYS[d.getDay()] + ", " + d.getDate() + " " + MONTHS[d.getMonth()], day: d.getDate() + " " + MONTHS[d.getMonth()].slice(0, 3),
       outsideC: 27, soc: 64, fuelPct: 72, evRangeKm: 59, totalRangeKm: 733, carplay: "connected", parked: true
     };
   }
@@ -644,10 +707,12 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
   var mq = /mode=(\w+)/.exec(q), wq = /open=([\w,]+)/.exec(q), aq = /ang=(\d+)/.exec(q);
   applyMode(mq ? mq[1] : modePref, !!mq);
   for (var i = 0; i < N; i++) { load("c", (HERO + i) % N); load("m", (HERO + i) % N); load("e", (HERO + i) % N); }
+  setTimeout(function () { for (var k = 0; k < N; k++) load("n", (HERO + k) % N); }, 1500);
   load("o", HERO);
   start();
   if (/still/.test(q)) { H.classList.add("live"); H.classList.add("still"); view.t = 1; view.ang = HERO; clearTimeout(introT); introDone = true; lights.base = lights.level = 1; }
   if (aq) { view.t = 1; view.ang = +aq[1]; }
+  if (/[?&]set\b/.test(q)) H.classList.add("setopen");
   if (wq) wq[1].split(",").forEach(function (id) { if (id in win) win[id] = goal[id] = 100; });
 })();
 </script>

@@ -23,7 +23,11 @@ build("road.src.html", "king-road.html")
 
 home = here / "assets" / "home"
 meta = json.loads((home / "meta.json").read_text())
-frames = [{k: uri(home / f"{k}{i:02d}.{'png' if k == 'm' else 'webp'}") for k in "come"} for i in range(meta["n"])]
-import math
-cam = {"r": meta["r"], "el": math.radians(meta["el"]), "tz": meta["tz"], "tf": meta["tf"], "box": meta["box"], "sc": meta["sc"], "zg": meta["zg"]}
+frames = [{k: uri(home / f"{k}{i:02d}.{'png' if k == 'm' else 'webp'}") for k in "comen"} for i in range(meta["n"])]
+cam = {k: meta[k] for k in ("dist", "hc", "tz", "f", "cx", "cy", "box", "sc")}
+for n in ("standard", "halloween", "christmas", "carnaval"):
+    th = home / f"thumb-{n}.webp"
+    if not th.exists():
+        from PIL import Image
+        Image.new("RGB", (8, 5), (15, 15, 15)).save(th)
 build("home.src.html", "king-home.html", {"frames": json.dumps(frames), "cam": json.dumps(cam), "fw": str(meta["fw"]), "fh": str(meta["fh"]), "ms": str(meta["ms"])})
