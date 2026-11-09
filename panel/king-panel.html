@@ -3,126 +3,149 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wdth,wght@75..100,400..700&display=swap">
 <style>
 :root {
-  --bg: #F3F4F2;
-  --fg: #16191C;
-  --muted: #5E656C;
-  --line: #D5D8D6;
+  --bg: #F2F2F0;
+  --fg: #141414;
+  --muted: #62625F;
+  --line: #D6D6D2;
   --btn: #FFFFFF;
-  --btn-on: #16191C;
-  --btn-on-fg: #F3F4F2;
-  --p-bg: #0A0C0E;
-  --p-fg: #EDEBE6;
-  --p-muted: #7D838A;
-  --p-faint: #2A2F34;
-  --p-elec: #5FB3DE;
-  --p-fuel: #E0A23E;
-  --p-turn: #3DBE6A;
-  --p-warn: #E5483B;
-  --f-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
-  --f-body: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --btn-on: #141414;
+  --btn-on-fg: #F2F2F0;
+  --k-bg: #000000;
+  --k-tile: #111111;
+  --k-fg: #F2F2F2;
+  --k-dim: #7A7A7A;
+  --k-off: #333333;
+  --k-line: #2A2A2A;
+  --k-accent: #FF7A1A;
+  --k-turn: #34C26A;
+  --k-warn: #E5383B;
+  --f: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #111416; --fg: #E9EAE7; --muted: #949BA2; --line: #2A2F33;
-    --btn: #1A1E21; --btn-on: #E9EAE7; --btn-on-fg: #111416; color-scheme: dark;
+    --bg: #0B0B0B; --fg: #ECECEA; --muted: #8E8E8A; --line: #262626;
+    --btn: #161616; --btn-on: #ECECEA; --btn-on-fg: #0B0B0B; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #111416; --fg: #E9EAE7; --muted: #949BA2; --line: #2A2F33;
-  --btn: #1A1E21; --btn-on: #E9EAE7; --btn-on-fg: #111416; color-scheme: dark;
+  --bg: #0B0B0B; --fg: #ECECEA; --muted: #8E8E8A; --line: #262626;
+  --btn: #161616; --btn-on: #ECECEA; --btn-on-fg: #0B0B0B; color-scheme: dark;
 }
 html, body { height: 100%; }
 body {
-  background: var(--bg); color: var(--fg); font-family: var(--f-body);
+  background: var(--bg); color: var(--fg); font-family: var(--f);
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
-.page { max-width: 1120px; margin: 0 auto; padding-block: 40px 56px; display: grid; gap: 24px; }
+.page { max-width: 1160px; margin: 0 auto; padding-block: 40px 64px; display: grid; gap: 28px; }
 .head { display: grid; gap: 8px; }
-.head h1 { margin: 0; font-size: clamp(26px, 4vw, 36px); font-weight: 700; font-variation-settings: "wdth" 110; letter-spacing: 0; text-wrap: balance; }
-.head p { margin: 0; color: var(--muted); font-size: 16px; line-height: 1.5; max-width: 62ch; }
-.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.controls button {
-  font: 500 15px/1 var(--f-body); color: var(--fg); background: var(--btn);
-  border: 1px solid var(--line); border-radius: 6px; padding: 10px 14px; cursor: pointer;
-}
+.head h1 { margin: 0; font-size: clamp(26px, 4vw, 34px); font-weight: 600; letter-spacing: 0; }
+.head p { margin: 0; color: var(--muted); font-size: 16px; line-height: 1.5; max-width: 60ch; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; position: sticky; top: env(safe-area-inset-top, 0px); background: var(--bg); padding-block: 10px; z-index: 5; }
+.controls button { font: 500 15px/1 var(--f); color: var(--fg); background: var(--btn); border: 1px solid var(--line); border-radius: 6px; padding: 10px 14px; cursor: pointer; }
 .controls button[aria-pressed="true"] { background: var(--btn-on); color: var(--btn-on-fg); border-color: var(--btn-on); }
-.controls button:focus-visible { outline: 2px solid var(--p-elec); outline-offset: 2px; }
+.controls button:focus-visible { outline: 2px solid var(--k-accent); outline-offset: 2px; }
 .controls .sep { width: 1px; height: 24px; background: var(--line); margin-inline: 4px; }
-.stage { position: relative; width: 100%; max-width: 100%; aspect-ratio: 1280 / 480; border-radius: 10px; overflow: hidden; background: var(--p-bg); }
-.notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px 32px; color: var(--muted); font-size: 15px; line-height: 1.5; }
-.notes b { color: var(--fg); font-weight: 600; display: block; margin-bottom: 2px; }
+.design { display: grid; gap: 12px; }
+.design h2 { margin: 0; font-size: 20px; font-weight: 600; letter-spacing: 0; }
+.design p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.5; max-width: 70ch; }
+.stage { position: relative; width: 100%; max-width: 100%; aspect-ratio: 1280 / 480; border-radius: 12px; overflow: hidden; background: var(--k-bg); }
 
-.panel {
-  position: absolute; left: 0; top: 0; width: 1280px; height: 480px; transform-origin: 0 0;
-  background: var(--p-bg); color: var(--p-fg); font-family: var(--f-display);
-  font-variant-numeric: tabular-nums; overflow: hidden; user-select: none;
-}
-.panel * { box-sizing: border-box; }
-.turn { position: absolute; top: 30px; width: 44px; height: 36px; color: var(--p-faint); }
-.turn.on { color: var(--p-turn); }
-.turn.l { left: 56px; } .turn.r { right: 56px; }
-.turn svg { width: 100%; height: 100%; display: block; fill: currentColor; }
+.k { position: absolute; left: 0; top: 0; width: 1280px; height: 480px; transform-origin: 0 0; background: var(--k-bg); color: var(--k-fg); font-family: var(--f); font-variant-numeric: tabular-nums; overflow: hidden; user-select: none; letter-spacing: 0; }
+.k * { box-sizing: border-box; }
+.k .turn { position: absolute; width: 30px; height: 26px; color: var(--k-off); }
+.k .turn.on { color: var(--k-turn); }
+.k .turn svg { width: 100%; height: 100%; display: block; fill: currentColor; }
+.k .warns { position: absolute; left: 0; right: 0; display: flex; justify-content: center; gap: 10px; }
+.k .warns span { font-size: 17px; font-weight: 600; padding: 5px 10px; border-radius: 4px; background: var(--k-warn); color: #fff; }
+.k .small { font-size: 18px; color: var(--k-dim); }
 
-.mode { position: absolute; top: 30px; left: 0; right: 0; text-align: center; font-size: 24px; font-weight: 600; font-variation-settings: "wdth" 100; color: var(--p-elec); transition: color .4s; }
-.mode.fuel { color: var(--p-fuel); }
-.mode.idle { color: var(--p-muted); }
+.calm .tile { position: absolute; top: 112px; width: 372px; height: 256px; background: var(--k-tile); border-radius: 16px; padding: 26px 30px; }
+.calm .tile.l { left: 84px; }
+.calm .tile.r { right: 84px; }
+.calm .lbl { font-size: 17px; line-height: 1.25; color: var(--k-accent); font-weight: 500; }
+.calm .lbl span { display: block; color: var(--k-dim); font-weight: 400; }
+.calm .big { position: absolute; left: 28px; bottom: 34px; font-size: 128px; line-height: 1; font-weight: 400; font-variation-settings: "wdth" 92; }
+.calm .big small { font-size: 52px; color: var(--k-dim); margin-left: 2px; }
+.calm .meter { position: absolute; right: 30px; top: 30px; bottom: 34px; width: 8px; border-radius: 4px; background: var(--k-off); overflow: hidden; }
+.calm .meter i { position: absolute; left: 0; right: 0; bottom: 0; background: var(--k-fg); border-radius: 4px; }
+.calm .meter.fuel { right: 46px; }
+.calm .meter.fuel i { background: var(--k-accent); }
+.calm .foot { position: absolute; left: 30px; right: 70px; bottom: 30px; display: none; }
+.calm .gears { position: absolute; right: 34px; top: 160px; display: grid; gap: 10px; font-size: 20px; font-weight: 600; text-align: center; }
+.calm .gears span { color: var(--k-off); }
+.calm .gears span.on { color: var(--k-accent); }
+.calm .mid { position: absolute; left: 456px; width: 368px; top: 112px; height: 256px; display: grid; align-content: center; justify-items: center; gap: 18px; }
+.calm .mode { font-size: 22px; font-weight: 500; color: var(--k-dim); }
+.calm .mode.fuel { color: var(--k-accent); }
+.calm .pw { width: 220px; height: 3px; background: var(--k-off); position: relative; border-radius: 2px; }
+.calm .pw .z { position: absolute; left: 25%; top: -5px; width: 1px; height: 13px; background: var(--k-dim); }
+.calm .pw i { position: absolute; top: 0; height: 3px; background: var(--k-fg); border-radius: 2px; }
+.calm .pw i.fuel { background: var(--k-accent); }
+.calm .kw { font-size: 17px; color: var(--k-dim); }
+.calm .top { position: absolute; top: 40px; left: 84px; right: 84px; display: flex; justify-content: space-between; }
+.calm .bottom { position: absolute; bottom: 38px; left: 84px; right: 84px; display: flex; justify-content: space-between; }
+.calm .bottom b, .road .info b, .dial .info b { color: var(--k-fg); font-weight: 500; margin-left: 6px; }
+.calm .turn.l { left: 560px; top: 40px; } .calm .turn.r { left: 690px; top: 40px; }
+.calm .warns { top: 78px; }
 
-.speed { position: absolute; left: 400px; width: 480px; top: 58px; text-align: center; font-size: 196px; line-height: 1; font-weight: 700; font-variation-settings: "wdth" 112; letter-spacing: 0; }
-.unit { position: absolute; left: 400px; width: 480px; top: 250px; text-align: center; font-size: 22px; color: var(--p-muted); font-weight: 500; }
+.road canvas { position: absolute; left: 0; top: 0; width: 1280px; height: 480px; }
+.road .spd { position: absolute; left: 64px; top: 52px; font-size: 168px; line-height: 1; font-weight: 400; font-variation-settings: "wdth" 85; }
+.road .unit { position: absolute; left: 70px; top: 228px; font-size: 22px; color: var(--k-dim); }
+.road .gears { position: absolute; left: 70px; top: 284px; display: flex; gap: 22px; font-size: 26px; font-weight: 600; }
+.road .gears span { color: var(--k-off); }
+.road .gears span.on { color: var(--k-fg); }
+.road .stores { position: absolute; left: 70px; bottom: 44px; width: 300px; display: grid; gap: 16px; }
+.road .row { display: grid; grid-template-columns: 70px 1fr 56px; align-items: center; gap: 12px; font-size: 17px; color: var(--k-dim); }
+.road .row .v { color: var(--k-fg); text-align: right; font-weight: 500; }
+.road .bar { height: 4px; background: var(--k-off); border-radius: 2px; position: relative; overflow: hidden; }
+.road .bar i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--k-fg); }
+.road .bar.fuel i { background: var(--k-accent); }
+.road .info { position: absolute; right: 56px; top: 40px; display: flex; gap: 26px; }
+.road .mode { position: absolute; left: 450px; top: 40px; font-size: 18px; font-weight: 500; color: var(--k-dim); }
+.road .mode.fuel { color: var(--k-accent); }
+.road .turn.l { left: 790px; top: 38px; } .road .turn.r { left: 880px; top: 38px; }
+.road .warns { top: 80px; left: 420px; }
 
-.power { position: absolute; left: 420px; width: 440px; top: 296px; }
-.power .track { position: relative; height: 8px; background: var(--p-faint); border-radius: 4px; }
-.power .zero { position: absolute; left: 25%; top: -6px; width: 2px; height: 20px; background: var(--p-muted); }
-.power .fill { position: absolute; top: 0; height: 8px; border-radius: 4px; background: var(--p-elec); transition: background-color .4s; }
-.power .fill.fuel { background: var(--p-fuel); }
-.power .fill.regen { background: var(--p-elec); }
-.power .scale { display: flex; justify-content: space-between; margin-top: 10px; font-size: 16px; color: var(--p-muted); }
-.power .kw { color: var(--p-fg); }
-
-.gears { position: absolute; left: 400px; width: 480px; top: 352px; display: flex; justify-content: center; gap: 30px; font-size: 30px; font-weight: 700; font-variation-settings: "wdth" 105; }
-.gears span { color: var(--p-faint); padding-bottom: 4px; border-bottom: 3px solid transparent; min-width: 22px; text-align: center; }
-.gears span.on { color: var(--p-fg); border-bottom-color: var(--p-fg); }
-
-.store { position: absolute; top: 112px; width: 300px; }
-.store.batt { left: 56px; }
-.store.fuel { right: 56px; text-align: right; }
-.store .label { font-size: 20px; color: var(--p-muted); font-weight: 500; }
-.store .val { font-size: 92px; line-height: 1; font-weight: 650; font-variation-settings: "wdth" 100; margin-top: 8px; }
-.store .val small { font-size: 40px; font-weight: 500; color: var(--p-muted); margin-left: 4px; }
-.bar { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; margin-top: 20px; height: 12px; }
-.bar i { display: block; border-radius: 2px; background: var(--p-faint); }
-.batt .bar i.on { background: var(--p-elec); }
-.fuel .bar i.on { background: var(--p-fuel); }
-.bar i.low { background: var(--p-warn) !important; }
-.store .sub { margin-top: 18px; font-size: 20px; color: var(--p-muted); }
-.store .sub b { color: var(--p-fg); font-weight: 600; }
-
-.foot { position: absolute; left: 56px; right: 56px; bottom: 26px; border-top: 1px solid var(--p-faint); padding-top: 14px; display: flex; justify-content: space-between; font-size: 18px; color: var(--p-muted); }
-.foot span b { color: var(--p-fg); font-weight: 600; margin-left: 6px; }
-.foot .grp { display: flex; gap: 28px; }
-
-.warns { position: absolute; top: 76px; left: 0; right: 0; display: flex; justify-content: center; gap: 12px; }
-.warns span { font-size: 18px; font-weight: 600; padding: 4px 10px; border-radius: 4px; background: var(--p-warn); color: #fff; }
-.warns span.amber { background: var(--p-fuel); color: #111; }
+.dial svg { position: absolute; left: 0; top: 0; width: 1280px; height: 480px; }
+.dial .spd { position: absolute; left: 440px; width: 400px; top: 168px; text-align: center; font-size: 136px; line-height: 1; font-weight: 400; font-variation-settings: "wdth" 88; }
+.dial .unit { position: absolute; left: 440px; width: 400px; top: 310px; text-align: center; font-size: 20px; color: var(--k-dim); }
+.dial .mode { position: absolute; left: 440px; width: 400px; top: 130px; text-align: center; font-size: 18px; font-weight: 500; color: var(--k-dim); }
+.dial .mode.fuel { color: var(--k-accent); }
+.dial .gears { position: absolute; left: 440px; width: 400px; top: 400px; display: flex; justify-content: center; gap: 22px; font-size: 24px; font-weight: 600; }
+.dial .gears span { color: var(--k-off); }
+.dial .gears span.on { color: var(--k-fg); }
+.dial .side { position: absolute; top: 150px; width: 250px; }
+.dial .side.l { left: 70px; }
+.dial .side.r { right: 70px; text-align: right; }
+.dial .side .lbl { font-size: 17px; color: var(--k-dim); }
+.dial .side .val { font-size: 64px; line-height: 1.1; font-weight: 400; margin-top: 4px; }
+.dial .side .val small { font-size: 28px; color: var(--k-dim); }
+.dial .side .ticks { display: grid; grid-template-columns: repeat(20, 1fr); gap: 4px; margin-top: 14px; height: 14px; }
+.dial .side .ticks i { background: var(--k-off); }
+.dial .side .ticks i.on { background: var(--k-fg); }
+.dial .side.r .ticks i.on { background: var(--k-accent); }
+.dial .side .sub { margin-top: 14px; font-size: 17px; color: var(--k-dim); }
+.dial .side .sub b { color: var(--k-fg); font-weight: 500; margin-left: 4px; }
+.dial .info { position: absolute; left: 70px; right: 70px; bottom: 40px; display: flex; justify-content: space-between; }
+.dial .info b[data-k="clock"] { margin-left: 18px; }
+.dial .turn.l { left: 70px; top: 44px; } .dial .turn.r { right: 70px; top: 44px; }
+.dial .warns { top: 44px; }
 
 body.car { padding: 0; background: #000; overflow: hidden; }
 body.car .page { display: block; max-width: none; padding: 0; height: 100%; }
-body.car .head, body.car .controls, body.car .notes { display: none; }
+body.car .head, body.car .controls, body.car .design > h2, body.car .design > p, body.car .design:not(.show) { display: none; }
+body.car .design.show { display: block; height: 100%; }
 body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 0; }
-
-@media (prefers-reduced-motion: reduce) {
-  .mode, .power .fill { transition: none; }
-}
 </style>
 
 <div class="page">
   <header class="head">
     <h1>King Driver Panel</h1>
-    <p>First design for the King's 8.8 inch driver display, shown here on a simulated drive. On the car, every value comes from the King itself: speed, gear, battery, fuel, power and range.</p>
+    <p>Three directions for the King's 8.8 inch driver display. All three run the same simulated drive, so you can compare them in the same moment.</p>
   </header>
 
   <div class="controls" role="group" aria-label="Simulated drive">
@@ -133,150 +156,282 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
     <button id="sc-pause" type="button" aria-pressed="false">Pause</button>
   </div>
 
-  <div class="stage" id="stage">
-    <div class="panel" id="panel" aria-label="Driver display">
-      <div class="turn l" id="turnL"><svg viewBox="0 0 44 36" aria-hidden="true"><path d="M0 18 20 0v11h24v14H20v11z"/></svg></div>
-      <div class="turn r" id="turnR"><svg viewBox="0 0 44 36" aria-hidden="true"><path d="M44 18 24 0v11H0v14h24v11z"/></svg></div>
+  <section class="design" id="d-calm">
+    <h2>Calm</h2>
+    <p>Two quiet tiles and a lot of black. Speed on the left, battery and fuel on the right, gears stacked at the edge. Orange only marks labels and the engine.</p>
+    <div class="stage"><div class="k calm" id="calm">
+      <div class="top small"><span data-k="clock">00:00</span><span data-k="temp">0°C</span></div>
+      <div class="turn l" data-k="turnL"><svg viewBox="0 0 30 26"><path d="M0 13 14 0v8h16v10H14v8z"/></svg></div>
+      <div class="turn r" data-k="turnR"><svg viewBox="0 0 30 26"><path d="M30 13 16 0v8H0v10h16v8z"/></svg></div>
+      <div class="warns" data-k="warns"></div>
+      <div class="tile l">
+        <div class="lbl">Speed<span>km/h</span></div>
+        <div class="big" data-k="speed">0</div>
+      </div>
+      <div class="mid">
+        <div class="mode" data-k="mode">Ready</div>
+        <div class="pw"><div class="z"></div><i data-k="pfill"></i></div>
+        <div class="kw" data-k="kw">0 kW</div>
+      </div>
+      <div class="tile r">
+        <div class="lbl">Battery<span data-k="evr">0 km electric</span></div>
+        <div class="big"><span data-k="soc">0</span><small>%</small></div>
+        <div class="meter"><i data-k="socM"></i></div>
+        <div class="meter fuel"><i data-k="fuelM"></i></div>
+      </div>
+      <div class="gears" data-k="gears"><span>P</span><span>R</span><span>N</span><span>D</span></div>
+      <div class="bottom small"><span>Fuel<b data-k="fuel">0%</b></span><span>Range<b data-k="tr">0 km</b></span><span>Trip<b data-k="l100">0,0 L/100 km</b></span></div>
+    </div></div>
+  </section>
 
-      <div class="mode" id="mode">Ready</div>
-      <div class="warns" id="warns"></div>
-
-      <div class="speed" id="speed">0</div>
+  <section class="design" id="d-road">
+    <h2>Road</h2>
+    <p>Speed stays large on the left. The rest of the display is the lane ahead, with the King drawn from behind. Lane marks move with your speed and the light bar brightens when you brake.</p>
+    <div class="stage"><div class="k road" id="road">
+      <canvas width="1280" height="480" data-k="canvas"></canvas>
+      <div class="spd" data-k="speed">0</div>
       <div class="unit">km/h</div>
-
-      <div class="power">
-        <div class="track"><div class="zero"></div><div class="fill" id="pfill"></div></div>
-        <div class="scale"><span>Charge</span><span class="kw" id="kw">0 kW</span><span>Power</span></div>
+      <div class="gears" data-k="gears"><span>P</span><span>R</span><span>N</span><span>D</span></div>
+      <div class="stores">
+        <div class="row"><span>Battery</span><div class="bar"><i data-k="socM"></i></div><span class="v" data-k="socT">0%</span></div>
+        <div class="row"><span>Fuel</span><div class="bar fuel"><i data-k="fuelM"></i></div><span class="v" data-k="fuel">0%</span></div>
       </div>
+      <div class="mode" data-k="mode">Ready</div>
+      <div class="turn l" data-k="turnL"><svg viewBox="0 0 30 26"><path d="M0 13 14 0v8h16v10H14v8z"/></svg></div>
+      <div class="turn r" data-k="turnR"><svg viewBox="0 0 30 26"><path d="M30 13 16 0v8H0v10h16v8z"/></svg></div>
+      <div class="warns" data-k="warns"></div>
+      <div class="info small"><span>Range<b data-k="tr">0 km</b></span><span data-k="temp">0°C</span><span data-k="clock">00:00</span></div>
+    </div></div>
+  </section>
 
-      <div class="gears" id="gears"><span data-g="P">P</span><span data-g="R">R</span><span data-g="N">N</span><span data-g="D">D</span></div>
-
-      <div class="store batt">
-        <div class="label">Battery</div>
-        <div class="val"><span id="soc">0</span><small>%</small></div>
-        <div class="bar" id="socBar"></div>
-        <div class="sub">Electric range <b id="evr">0 km</b></div>
+  <section class="design" id="d-dial">
+    <h2>Dial</h2>
+    <p>One hairline dial from 0 to 200 km/h, filled to your speed. The short inner arc shows power: right when you accelerate, left when you charge. Battery on the left, fuel on the right.</p>
+    <div class="stage"><div class="k dial" id="dial">
+      <svg viewBox="0 0 1280 480" data-k="svg"></svg>
+      <div class="turn l" data-k="turnL"><svg viewBox="0 0 30 26"><path d="M0 13 14 0v8h16v10H14v8z"/></svg></div>
+      <div class="turn r" data-k="turnR"><svg viewBox="0 0 30 26"><path d="M30 13 16 0v8H0v10h16v8z"/></svg></div>
+      <div class="warns" data-k="warns"></div>
+      <div class="mode" data-k="mode">Ready</div>
+      <div class="spd" data-k="speed">0</div>
+      <div class="unit">km/h</div>
+      <div class="gears" data-k="gears"><span>P</span><span>R</span><span>N</span><span>D</span></div>
+      <div class="side l">
+        <div class="lbl">Battery</div>
+        <div class="val"><span data-k="soc">0</span><small>%</small></div>
+        <div class="ticks" data-k="socT20"></div>
+        <div class="sub">Electric<b data-k="evr">0 km</b></div>
       </div>
-
-      <div class="store fuel">
-        <div class="label">Fuel</div>
-        <div class="val"><span id="fuel">0</span><small>%</small></div>
-        <div class="bar" id="fuelBar"></div>
-        <div class="sub">Total range <b id="tr">0 km</b></div>
+      <div class="side r">
+        <div class="lbl">Fuel</div>
+        <div class="val"><span data-k="fuelN">0</span><small>%</small></div>
+        <div class="ticks" data-k="fuelT20"></div>
+        <div class="sub">Range<b data-k="tr">0 km</b></div>
       </div>
-
-      <div class="foot">
-        <div class="grp"><span>Odometer<b id="odo">0 km</b></span><span>Trip<b id="trip">0.0 km</b></span></div>
-        <div class="grp"><span>Fuel use<b id="l100">0.0 L/100 km</b></span><span>Electric use<b id="kwh">0.0 kWh/100 km</b></span></div>
-        <div class="grp"><span>Outside<b id="temp">0°C</b></span><span><b id="clock">00:00</b></span></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="notes">
-    <div><b>Blue is electric, amber is fuel</b>The mode, power bar and stores turn amber when the 1.5 engine joins in, so you can see the hybrid working at a glance.</div>
-    <div><b>Power, not revs</b>The bar runs from charging on the left to full power on the right. The mark is zero. Braking and lifting off fill it to the left.</div>
-    <div><b>Safety lights stay BYD's</b>Seat belt, airbag, brake and engine warnings stay on the King's own display. This design keeps a red row free for anything the car reports.</div>
-  </div>
+      <div class="info small"><span>Odometer<b data-k="odo">0 km</b></span><span><span data-k="temp">0°C</span><b data-k="clock">00:00</b></span></div>
+    </div></div>
+  </section>
 </div>
 
 <script>
 (function () {
-  var $ = function (id) { return document.getElementById(id); };
-  var panel = $("panel"), stage = $("stage");
-  var carMode = /^#car/.test(location.hash);
-  if (carMode) document.body.classList.add("car");
+  var MAX_KW = 145, MIN_KW = -48;
+  var hash = location.hash.replace("#", "");
+  var carMatch = /^car-(calm|road|dial)/.exec(hash);
+  var carMode = !!carMatch;
+  if (carMode) {
+    document.body.classList.add("car");
+    document.getElementById("d-" + carMatch[1]).classList.add("show");
+  }
+
+  var panels = ["calm", "road", "dial"].map(function (id) {
+    var root = document.getElementById(id), refs = {};
+    Array.prototype.forEach.call(root.querySelectorAll("[data-k]"), function (el) { refs[el.getAttribute("data-k")] = el; });
+    return { id: id, root: root, stage: root.parentNode, r: refs };
+  });
 
   function fit() {
-    var w = stage.clientWidth, h = stage.clientHeight;
-    var s = carMode ? Math.min(w / 1280, h / 480) : w / 1280;
-    var ox = carMode ? (w - 1280 * s) / 2 : 0, oy = carMode ? (h - 480 * s) / 2 : 0;
-    panel.style.transform = "translate(" + ox + "px," + oy + "px) scale(" + s + ")";
+    panels.forEach(function (p) {
+      var w = p.stage.clientWidth, h = p.stage.clientHeight;
+      if (!w || !h) return;
+      var s = carMode ? Math.min(w / 1280, h / 480) : w / 1280;
+      var ox = carMode ? (w - 1280 * s) / 2 : 0, oy = carMode ? (h - 480 * s) / 2 : 0;
+      p.root.style.transform = "translate(" + ox + "px," + oy + "px) scale(" + s + ")";
+    });
   }
-  if (window.ResizeObserver) new ResizeObserver(fit).observe(stage);
+  if (window.ResizeObserver) panels.forEach(function (p) { new ResizeObserver(fit).observe(p.stage); });
   window.addEventListener("resize", fit);
   fit();
 
-  function bar(el) { var h = ""; for (var i = 0; i < 10; i++) h += "<i></i>"; el.innerHTML = h; return el.children; }
-  var socSegs = bar($("socBar")), fuelSegs = bar($("fuelBar"));
-  function fillBar(segs, pct, lowAt) {
-    var n = Math.ceil(pct / 10);
-    for (var i = 0; i < 10; i++) {
-      segs[i].className = i < n ? (pct <= lowAt ? "on low" : "on") : "";
+  function ticks(el) { var h = ""; for (var i = 0; i < 20; i++) h += "<i></i>"; el.innerHTML = h; return el.children; }
+  var dialP = panels[2];
+  var socT = ticks(dialP.r.socT20), fuelT = ticks(dialP.r.fuelT20);
+
+  var NS = "http://www.w3.org/2000/svg";
+  var CX = 640, CY = 262, R = 214, A0 = 140, A1 = 400, VMAX = 200;
+  function pt(r, deg) { var a = deg * Math.PI / 180; return [CX + r * Math.cos(a), CY + r * Math.sin(a)]; }
+  function arc(r, d0, d1) {
+    if (Math.abs(d1 - d0) < 0.01) return "";
+    var p0 = pt(r, d0), p1 = pt(r, d1), large = Math.abs(d1 - d0) > 180 ? 1 : 0, sweep = d1 > d0 ? 1 : 0;
+    return "M" + p0[0].toFixed(1) + " " + p0[1].toFixed(1) + "A" + r + " " + r + " 0 " + large + " " + sweep + " " + p1[0].toFixed(1) + " " + p1[1].toFixed(1);
+  }
+  function svgEl(tag, attrs) { var e = document.createElementNS(NS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); return e; }
+  (function buildDial() {
+    var svg = dialP.r.svg;
+    svg.appendChild(svgEl("path", { d: arc(R, A0, A1), stroke: "#262626", "stroke-width": 2, fill: "none" }));
+    for (var v = 0; v <= VMAX; v += 10) {
+      var d = A0 + (A1 - A0) * v / VMAX, major = v % 20 === 0;
+      var a = pt(R + 8, d), b = pt(R + (major ? 22 : 15), d);
+      svg.appendChild(svgEl("line", { x1: a[0], y1: a[1], x2: b[0], y2: b[1], stroke: major ? "#8a8a8a" : "#3a3a3a", "stroke-width": major ? 2 : 1 }));
+      if (major && v % 40 === 0) {
+        var t = pt(R + 44, d), tx = svgEl("text", { x: t[0], y: t[1] + 6, "text-anchor": "middle", fill: "#6e6e6e", "font-size": 17, "font-family": "Instrument Sans, Helvetica Neue, Arial, sans-serif" });
+        tx.textContent = v; svg.appendChild(tx);
+      }
     }
+    dialP.speedArc = svgEl("path", { stroke: "#F2F2F2", "stroke-width": 4, fill: "none", "stroke-linecap": "round" });
+    dialP.pwrTrack = svgEl("path", { d: arc(R - 24, 230, 310), stroke: "#1E1E1E", "stroke-width": 3, fill: "none" });
+    dialP.pwrArc = svgEl("path", { stroke: "#F2F2F2", "stroke-width": 3, fill: "none", "stroke-linecap": "round" });
+    var z0 = pt(R - 32, 250), z1 = pt(R - 16, 250);
+    svg.appendChild(dialP.speedArc); svg.appendChild(dialP.pwrTrack); svg.appendChild(dialP.pwrArc);
+    svg.appendChild(svgEl("line", { x1: z0[0], y1: z0[1], x2: z1[0], y2: z1[1], stroke: "#7a7a7a", "stroke-width": 1 }));
+  })();
+
+  var road = panels[1], ctx = road.r.canvas.getContext("2d");
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  road.r.canvas.width = 1280 * dpr; road.r.canvas.height = 480 * dpr;
+  ctx.scale(dpr, dpr);
+  var VPX = 860, VPY = 132, K = 348, ZN = 3;
+  function proj(X, Z) { var s = ZN / Z; return [VPX + X * 160 * s, VPY + K * s, s]; }
+  function drawRoad(dist, braking, speed) {
+    ctx.clearRect(0, 0, 1280, 480);
+    ctx.save();
+    ctx.beginPath(); ctx.rect(470, 0, 810, 480); ctx.clip();
+    var lanes = [-1.9, 1.9];
+    lanes.forEach(function (X) {
+      for (var z = 2.4; z < 90; z += 0.75) {
+        var phase = ((z + dist) % 9 + 9) % 9;
+        if (phase > 3.5) continue;
+        var z2 = Math.min(z + 0.75, 90);
+        var a = proj(X - 0.08, z), b = proj(X + 0.08, z), c = proj(X + 0.08, z2), d = proj(X - 0.08, z2);
+        var alpha = Math.max(0, 1 - z / 70) * 0.8;
+        ctx.fillStyle = "rgba(150,150,150," + alpha.toFixed(3) + ")";
+        ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.lineTo(c[0], c[1]); ctx.lineTo(d[0], d[1]); ctx.closePath(); ctx.fill();
+      }
+    });
+    ctx.restore();
+    var base = proj(0, 4.2), s = base[2] * 160, bx = base[0], by = base[1];
+    function rr(x, y, w, h, r, col) { ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); ctx.fill(); }
+    ctx.fillStyle = "rgba(0,0,0,0.9)";
+    ctx.beginPath(); ctx.ellipse(bx, by, 1.05 * s, 0.09 * s, 0, 0, Math.PI * 2); ctx.fill();
+    rr(bx - 0.78 * s, by - 0.2 * s, 0.26 * s, 0.2 * s, 0.04 * s, "#0d0d0d");
+    rr(bx + 0.52 * s, by - 0.2 * s, 0.26 * s, 0.2 * s, 0.04 * s, "#0d0d0d");
+    ctx.fillStyle = "#7d8186";
+    ctx.beginPath();
+    ctx.moveTo(bx - 0.5 * s, by - 1.38 * s);
+    ctx.quadraticCurveTo(bx, by - 1.44 * s, bx + 0.5 * s, by - 1.38 * s);
+    ctx.lineTo(bx + 0.8 * s, by - 0.98 * s); ctx.lineTo(bx - 0.8 * s, by - 0.98 * s); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = "#24272a";
+    ctx.beginPath();
+    ctx.moveTo(bx - 0.46 * s, by - 1.33 * s);
+    ctx.quadraticCurveTo(bx, by - 1.38 * s, bx + 0.46 * s, by - 1.33 * s);
+    ctx.lineTo(bx + 0.7 * s, by - 1.02 * s); ctx.lineTo(bx - 0.7 * s, by - 1.02 * s); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = "#9a9ea3";
+    ctx.beginPath();
+    ctx.moveTo(bx - 0.84 * s, by - 0.99 * s); ctx.lineTo(bx + 0.84 * s, by - 0.99 * s);
+    ctx.quadraticCurveTo(bx + 0.94 * s, by - 0.96 * s, bx + 0.93 * s, by - 0.8 * s);
+    ctx.lineTo(bx + 0.91 * s, by - 0.22 * s); ctx.lineTo(bx - 0.91 * s, by - 0.22 * s);
+    ctx.lineTo(bx - 0.93 * s, by - 0.8 * s);
+    ctx.quadraticCurveTo(bx - 0.94 * s, by - 0.96 * s, bx - 0.84 * s, by - 0.99 * s);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = "#b5b9bd";
+    ctx.fillRect(bx - 0.86 * s, by - 0.99 * s, 1.72 * s, 0.05 * s);
+    ctx.fillStyle = braking ? "#ff4040" : "#a8252b";
+    ctx.fillRect(bx - 0.9 * s, by - 0.82 * s, 1.8 * s, 0.05 * s);
+    rr(bx - 0.19 * s, by - 0.6 * s, 0.38 * s, 0.12 * s, 0.015 * s, "#2b2d30");
+    rr(bx - 0.91 * s, by - 0.34 * s, 1.82 * s, 0.14 * s, 0.04 * s, "#4a4e52");
   }
 
-  var MAX_KW = 145, MIN_KW = -48;
-  var shown = { speed: 0, kw: 0 };
-  var target = null;
+  var shown = { speed: 0, kw: 0, dist: 0 }, target = null, lastSpeed = 0;
   var nf = function (n) { return Math.round(n).toLocaleString("pt-BR"); };
+  var dec = function (n) { return n.toFixed(1).replace(".", ","); };
 
-  function render() {
-    var s = target;
-    if (!s) return;
-    shown.speed += (s.speed - shown.speed) * 0.25;
-    shown.kw += (s.powerKw - shown.kw) * 0.2;
-    $("speed").textContent = Math.round(shown.speed);
-
-    var kw = shown.kw, span = MAX_KW - MIN_KW, zero = -MIN_KW / span;
-    var f = $("pfill");
-    if (kw >= 0) { f.style.left = (zero * 100) + "%"; f.style.width = (Math.min(kw, MAX_KW) / span * 100) + "%"; }
-    else { var w = Math.min(-kw, -MIN_KW) / span; f.style.left = ((zero - w) * 100) + "%"; f.style.width = (w * 100) + "%"; }
-    f.className = "fill" + (kw < -0.5 ? " regen" : (s.engineOn ? " fuel" : ""));
-    $("kw").textContent = Math.round(kw) + " kW";
+  function modeOf(s) {
+    if (s.gear === "P" && s.engineOn) return ["Engine charging", true];
+    if (s.gear === "P") return ["Ready", false];
+    if (s.engineOn) return ["Hybrid", true];
+    return ["EV", false];
   }
 
   function apply(s) {
     target = s;
-    var m = $("mode");
-    if (s.gear === "P" && s.engineOn) { m.textContent = "Engine charging"; m.className = "mode fuel"; }
-    else if (s.gear === "P") { m.textContent = "Ready"; m.className = "mode idle"; }
-    else if (s.engineOn) { m.textContent = "Hybrid"; m.className = "mode fuel"; }
-    else { m.textContent = "EV"; m.className = "mode"; }
-
-    var gs = $("gears").children;
-    for (var i = 0; i < gs.length; i++) gs[i].className = gs[i].getAttribute("data-g") === s.gear ? "on" : "";
-
-    $("soc").textContent = Math.round(s.soc);
-    $("fuel").textContent = Math.round(s.fuelPct);
-    fillBar(socSegs, s.soc, 15);
-    fillBar(fuelSegs, s.fuelPct, 12);
-    $("evr").textContent = nf(s.evRangeKm) + " km";
-    $("tr").textContent = nf(s.totalRangeKm) + " km";
-    $("odo").textContent = nf(s.odoKm) + " km";
-    $("trip").textContent = s.tripKm.toFixed(1).replace(".", ",") + " km";
-    $("l100").textContent = s.tripL100.toFixed(1).replace(".", ",") + " L/100 km";
-    $("kwh").textContent = s.tripKwh100.toFixed(1).replace(".", ",") + " kWh/100 km";
-    $("temp").textContent = Math.round(s.outsideC) + "°C";
-    $("clock").textContent = s.clock;
-    $("turnL").className = "turn l" + (s.turnL ? " on" : "");
-    $("turnR").className = "turn r" + (s.turnR ? " on" : "");
-
-    var w = $("warns"), html = "";
-    (s.warnings || []).forEach(function (x) { html += '<span class="' + (x.level === "amber" ? "amber" : "") + '">' + x.label + "</span>"; });
-    w.innerHTML = html;
-    $("mode").style.visibility = html ? "hidden" : "visible";
+    var m = modeOf(s);
+    panels.forEach(function (p) {
+      var r = p.r;
+      if (r.mode) { r.mode.textContent = m[0]; r.mode.className = "mode" + (m[1] ? " fuel" : ""); }
+      if (r.gears) Array.prototype.forEach.call(r.gears.children, function (g) { g.className = g.textContent === s.gear ? "on" : ""; });
+      if (r.soc) r.soc.textContent = Math.round(s.soc);
+      if (r.socT) r.socT.textContent = Math.round(s.soc) + "%";
+      if (r.fuel) r.fuel.textContent = Math.round(s.fuelPct) + "%";
+      if (r.fuelN) r.fuelN.textContent = Math.round(s.fuelPct);
+      if (r.socM) r.socM.style[p.id === "calm" ? "height" : "width"] = s.soc + "%";
+      if (r.fuelM) r.fuelM.style[p.id === "calm" ? "height" : "width"] = s.fuelPct + "%";
+      if (r.evr) r.evr.textContent = p.id === "calm" ? nf(s.evRangeKm) + " km electric" : nf(s.evRangeKm) + " km";
+      if (r.tr) r.tr.textContent = nf(s.totalRangeKm) + " km";
+      if (r.odo) r.odo.textContent = nf(s.odoKm) + " km";
+      if (r.l100) r.l100.textContent = dec(s.tripL100) + " L/100 km";
+      if (r.temp) r.temp.textContent = Math.round(s.outsideC) + "°C";
+      if (r.clock) r.clock.textContent = s.clock;
+      if (r.turnL) r.turnL.className = "turn l" + (s.turnL ? " on" : "");
+      if (r.turnR) r.turnR.className = "turn r" + (s.turnR ? " on" : "");
+      if (r.warns) {
+        var html = "";
+        (s.warnings || []).forEach(function (x) { html += "<span>" + x.label + "</span>"; });
+        r.warns.innerHTML = html;
+      }
+    });
+    var sn = Math.ceil(s.soc / 5), fn = Math.ceil(s.fuelPct / 5);
+    for (var i = 0; i < 20; i++) { socT[i].className = i < sn ? "on" : ""; fuelT[i].className = i < fn ? "on" : ""; }
   }
 
-  window.KingPanel = { update: apply };
+  var lastT = Date.now();
+  function render() {
+    var now = Date.now(), dt = Math.min((now - lastT) / 1000, 0.1); lastT = now;
+    var s = target; if (!s) return;
+    shown.speed += (s.speed - shown.speed) * 0.3;
+    shown.kw += (s.powerKw - shown.kw) * 0.2;
+    shown.dist += shown.speed / 3.6 * dt;
+    var v = Math.round(shown.speed), kw = shown.kw;
+    panels.forEach(function (p) { if (p.r.speed) p.r.speed.textContent = v; });
 
+    var span = MAX_KW - MIN_KW, zero = -MIN_KW / span, pf = panels[0].r.pfill;
+    if (kw >= 0) { pf.style.left = zero * 100 + "%"; pf.style.width = Math.min(kw, MAX_KW) / span * 100 + "%"; }
+    else { var w = Math.min(-kw, -MIN_KW) / span; pf.style.left = (zero - w) * 100 + "%"; pf.style.width = w * 100 + "%"; }
+    pf.className = s.engineOn && kw > 0 ? "fuel" : "";
+    panels[0].r.kw.textContent = Math.round(kw) + " kW";
+
+    dialP.speedArc.setAttribute("d", arc(R, A0, A0 + (A1 - A0) * Math.min(shown.speed, VMAX) / VMAX));
+    var pd = kw >= 0 ? 250 + 60 * Math.min(kw / MAX_KW, 1) : 250 - 20 * Math.min(-kw / -MIN_KW, 1);
+    dialP.pwrArc.setAttribute("d", kw >= 0 ? arc(R - 24, 250, pd) : arc(R - 24, pd, 250));
+    dialP.pwrArc.setAttribute("stroke", s.engineOn && kw > 0 ? "#FF7A1A" : "#F2F2F2");
+
+    var braking = s.speed < lastSpeed - 0.05 || kw < -3;
+    lastSpeed = s.speed;
+    drawRoad(shown.dist, braking, shown.speed);
+  }
   setInterval(render, 33);
+
+  window.KingPanel = { update: apply };
 
   var SCENES = {
     city: [[0, 0, "P"], [3, 0, "D"], [5, 32], [11, 48], [17, 48], [22, 0], [27, 0], [29, 38, 0, "L"], [36, 55], [43, 60], [48, 22], [52, 22, 0, "R"], [57, 0], [61, 0]],
     highway: [[0, 88, "D"], [6, 105], [14, 118], [24, 118], [30, 96], [36, 96, 0, "L"], [42, 124], [52, 112], [60, 88]],
     parked: [[0, 0, "P"], [60, 0]]
   };
-
-  var sim = {
-    scene: "city", t: 0, paused: false,
-    speed: 0, soc: 64, fuel: 72, odo: 18432, trip: 12.4, fuelUsedL: 0.48, kwhUsed: 1.76, engineOn: false,
-    last: null
-  };
+  var sim = { scene: "city", t: 0, paused: false, speed: 0, soc: 64, fuel: 72, odo: 18432, trip: 12.4, fuelUsedL: 0.48, kwhUsed: 1.76, engineOn: false, last: null };
 
   function sceneAt(name, t) {
     var k = SCENES[name], dur = k[k.length - 1][0], tt = t % dur, gear = "D", turn = null;
-    for (var i = 0; i < k.length; i++) { if (k[i][0] <= tt) { if (k[i][2]) gear = k[i][2]; } }
+    for (var i = 0; i < k.length; i++) if (k[i][0] <= tt && k[i][2]) gear = k[i][2];
     for (i = 0; i < k.length - 1; i++) {
       if (tt >= k[i][0] && tt < k[i + 1][0]) {
         if (k[i][3] && tt - k[i][0] < 4) turn = k[i][3];
@@ -289,19 +444,13 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
 
   function step(dt) {
     sim.t += dt;
-    var sc = sceneAt(sim.scene, sim.t);
-    var prev = sim.speed;
+    var sc = sceneAt(sim.scene, sim.t), prev = sim.speed;
     sim.speed = sc.speed;
     var v = sim.speed / 3.6, a = (sim.speed - prev) / 3.6 / Math.max(dt, 1e-3);
-    var force = 1650 * a + 0.5 * 1.2 * 0.62 * 2.35 * v * v + 160;
-    var kw = force * v / 1000;
+    var kw = (1650 * a + 0.5 * 1.2 * 0.62 * 2.35 * v * v + 160) * v / 1000;
     if (kw < 0) kw = Math.max(kw, MIN_KW);
     if (sc.gear === "P") kw = 0;
-
-    var wantEngine = sim.speed > 78 || kw > 70 || sim.soc < 25;
-    if (sc.gear === "P") wantEngine = sim.soc < 25;
-    sim.engineOn = wantEngine;
-
+    sim.engineOn = sc.gear === "P" ? sim.soc < 25 : (sim.speed > 78 || kw > 70 || sim.soc < 25);
     var hrs = dt / 3600, boost = 6;
     if (kw < 0) sim.soc += (-kw * hrs * boost) / 18.3 * 100;
     else if (!sim.engineOn) { sim.soc -= (kw * hrs * boost) / 18.3 * 100; sim.kwhUsed += kw * hrs * boost; }
@@ -315,19 +464,14 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
     sim.fuel = Math.min(100, Math.max(3, sim.fuel));
     var km = v * dt / 1000 * boost;
     sim.trip += km; sim.odo += km;
-
-    var blink = Math.floor(sim.t * 2.6) % 2 === 0;
-    var d = new Date();
+    var blink = Math.floor(sim.t * 2.6) % 2 === 0, d = new Date();
     return {
-      speed: sim.speed, gear: sc.gear, powerKw: kw, engineOn: sim.engineOn,
-      soc: sim.soc, fuelPct: sim.fuel,
+      speed: sim.speed, gear: sc.gear, powerKw: kw, engineOn: sim.engineOn, soc: sim.soc, fuelPct: sim.fuel,
       evRangeKm: sim.soc / 100 * 92, totalRangeKm: sim.soc / 100 * 92 + sim.fuel / 100 * 48 * 19.5,
-      odoKm: sim.odo, tripKm: sim.trip,
-      tripL100: sim.trip > 0.2 ? sim.fuelUsedL / sim.trip * 100 : 0,
-      tripKwh100: sim.trip > 0.2 ? sim.kwhUsed / sim.trip * 100 : 0,
-      outsideC: 27, clock: ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2),
-      turnL: sc.turn === "L" && blink, turnR: sc.turn === "R" && blink,
-      warnings: []
+      odoKm: sim.odo, tripKm: sim.trip, tripL100: sim.trip > 0.2 ? sim.fuelUsedL / sim.trip * 100 : 0,
+      tripKwh100: sim.trip > 0.2 ? sim.kwhUsed / sim.trip * 100 : 0, outsideC: 27,
+      clock: ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2),
+      turnL: sc.turn === "L" && blink, turnR: sc.turn === "R" && blink, warnings: []
     };
   }
 
@@ -338,22 +482,17 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
     sim.last = ts;
     if (!sim.paused) apply(step(dt));
   }
-
-  var runSim = !carMode || /demo/.test(location.hash);
-  if (runSim) {
-    apply(step(0));
-    setInterval(tick, 50);
-  }
+  if (!carMode || /demo/.test(hash)) { apply(step(0)); setInterval(tick, 50); }
 
   var btns = document.querySelectorAll("[data-sc]");
   Array.prototype.forEach.call(btns, function (b) {
     b.addEventListener("click", function () {
-      sim.scene = b.getAttribute("data-sc"); sim.t = 0; sim.trip = 12.4; sim.fuelUsedL = 0.48; sim.kwhUsed = 1.76;
+      sim.scene = b.getAttribute("data-sc"); sim.t = 0;
       if (sim.scene === "parked") sim.soc = Math.min(sim.soc, 22);
       Array.prototype.forEach.call(btns, function (o) { o.setAttribute("aria-pressed", o === b ? "true" : "false"); });
     });
   });
-  $("sc-pause").addEventListener("click", function () {
+  document.getElementById("sc-pause").addEventListener("click", function () {
     sim.paused = !sim.paused;
     this.setAttribute("aria-pressed", sim.paused ? "true" : "false");
     this.textContent = sim.paused ? "Play" : "Pause";
