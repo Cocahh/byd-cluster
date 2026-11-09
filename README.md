@@ -42,7 +42,10 @@ Custom designs for the 8.8 inch driver display and the 12.8 inch center screen o
 - The car is a 48 frame turntable rendered from the Sketchfab model, not live 3D. Each angle has a closed frame (`cNN.webp`), an open window overlay (`oNN.webp`) and a window id mask (`mNN.png`, value 60 per id, order fl, fr, rl, rr) in `panel/assets/home`.
 - The model has no separate window nodes. Material `Glass` is all window glass and `D_Glass` is only the sunroof, so windows are split from a glass mask render and labelled by projecting onto the door planes.
 - Contract in: `window.KingHome.update({ clock, date, outsideC, soc, fuelPct, evRangeKm, totalRangeKm, carplay, parked, windows: { fl, fr, rl, rr } })` with windows as 0 to 100 percent open. `KingHome.setMode('auto'|'standard'|'halloween'|'christmas'|'carnaval')`.
-- Contract out: `window.KingHost.openApp('carplay'|'nav'|'browser'|'settings')` and `KingHost.setWindow(id, 'open'|'close')`. Without a host the page simulates window travel.
+- Contract out: `window.KingHost.openApp('carplay'|'nav'|'browser'|'settings')` and `KingHost.setWindow(id, 'open'|'close')`, `KingHost.flashLights()`. Without a host the page simulates window travel.
+- The scene is drawn in true perspective from the render camera (`meta.json` carries it): floor light, car shadow and the platter ring turn with the car, while theme props stay fixed around it. Lamps are a per angle overlay (`eNN.webp`) that wakes after the intro and can be flashed.
+- Labels on leader lines sit on each visible door window and the headlamp, and hide while the car is turning.
+- Theme props (`prop-*.webp`) are stills of CC licensed Sketchfab models, credited in the page footer. `render/props2.sh` and `render/matte.py` remake them, `render/lights.py` remakes the lamp overlays.
 - The browser row is disabled unless `parked` is true.
 - `#car` shows it full screen. `?still` skips the intro, `?mode=`, `?open=fl,rr` and `?ang=` set up a state for screenshots.
 

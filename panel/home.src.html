@@ -41,7 +41,14 @@ body {
 .h[data-theme="christmas"] { --accent: #E5392C; }
 .h[data-theme="carnaval"] { --accent: #F4C21B; }
 
-.h .fx { position: absolute; left: 0; top: 0; width: 1340px; height: 1200px; pointer-events: none; }
+.h .fx { position: absolute; left: 0; top: 0; width: 1360px; height: 1200px; pointer-events: none; transition: opacity .32s linear; }
+.h .railbg { position: absolute; left: 1356px; top: 0; width: 564px; height: 1200px; background: #000; }
+.h .tag { position: absolute; left: 0; top: 0; display: flex; flex-direction: column; align-items: center; opacity: 0; pointer-events: none; transition: opacity .35s var(--ease); will-change: transform; }
+.h .tag.on { opacity: 1; pointer-events: auto; }
+.h .tag[data-tag="lights"] { flex-direction: column-reverse; }
+.h .tag span { display: block; font-size: 22px; line-height: 1; padding: 11px 18px 12px; border-radius: 999px; background: #000; border: 1px solid #3A3A38; color: var(--ink); white-space: nowrap; transition: border-color .2s var(--ease), background-color .2s var(--ease), color .2s var(--ease); }
+.h .tag i { display: block; width: 1px; background: #8D8D88; }
+.h .tag:active span { background: var(--ink); color: #000; border-color: var(--ink); }
 
 .h .time { position: absolute; left: 72px; top: 52px; }
 .h .time b { display: block; font-size: 132px; line-height: 1; font-weight: 300; margin-left: -6px; }
@@ -60,8 +67,6 @@ body {
 .h .glass p { margin: 0; min-width: 330px; }
 .h .glass button { color: var(--ink); padding: 12px 0; border-bottom: 1px solid var(--faint); transition: border-color .3s var(--ease); }
 .h .glass button:active { border-bottom-color: var(--accent); }
-.h .glass i { font-style: normal; color: var(--faint); transition: opacity .8s var(--ease); }
-.h .glass i.off { opacity: 0; }
 
 .h .stats { position: absolute; left: 72px; top: 958px; display: flex; gap: 64px; }
 .h .stat { width: 190px; }
@@ -111,23 +116,28 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
 <div class="page">
   <header class="head">
     <h1>King Home Screen</h1>
-    <p>The home screen for the center display. Drag the car to turn it, tap a window to lower it, and reach CarPlay in one touch.</p>
+    <p>The home screen for the center display. Drag the car to turn it, use the labels to lower a window or flash the lights, and reach CarPlay in one touch.</p>
   </header>
 
   <div class="stage" id="stage">
     <div class="h intro" id="h" data-theme="standard">
-      <canvas class="fx" id="fxBack" width="1340" height="1200"></canvas>
+      <canvas class="fx" id="fxBack" width="1360" height="1200"></canvas>
 
       <div class="time"><b id="clock">00:00</b><span id="date"></span><em id="greet"></em></div>
       <div class="out"><span>Outside</span><b id="temp">0°</b></div>
 
       <div class="carbox" id="carbox" tabindex="0" role="img" aria-label="Your King. Drag to turn it, tap a window to open or close it."><canvas id="car"></canvas></div>
-      <canvas class="fx" id="fxFront" width="1340" height="1200"></canvas>
+      <canvas class="fx" id="fxFront" width="1360" height="1200"></canvas>
+      <button type="button" class="tag" data-tag="fl"><span>Open</span><i></i></button>
+      <button type="button" class="tag" data-tag="fr"><span>Open</span><i></i></button>
+      <button type="button" class="tag" data-tag="rl"><span>Open</span><i></i></button>
+      <button type="button" class="tag" data-tag="rr"><span>Open</span><i></i></button>
+      <button type="button" class="tag" data-tag="lights"><span>Flash lights</span><i></i></button>
+      <div class="railbg"></div>
 
       <div class="glass">
         <p id="glassText" role="status">All windows closed</p>
         <button type="button" id="winAll">Open all</button>
-        <i id="hint">Drag to turn. Tap a window.</i>
       </div>
 
       <div class="stats">
@@ -156,7 +166,7 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
     </div>
   </div>
 
-  <p class="credit">3D model: 2025 BYD Seal 5 DM-i by ddiaz-design on Sketchfab, CC BY-NC-SA 4.0. Typeface: Neue Haas Display.</p>
+  <p class="credit">3D models from Sketchfab: 2025 BYD Seal 5 DM-i by ddiaz-design (CC BY-NC-SA 4.0), Jack-O-Lantern by kidkwazine (CC BY-SA), Gift Box 3D Scan by arkify (CC BY), Gift Box by MaX3Dd (CC BY), Snowy Pinetree by darkmyran888 (CC BY). Typeface: Neue Haas Display.</p>
 </div>
 
 <script>
@@ -190,7 +200,7 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
   var mcv = document.createElement("canvas"); mcv.width = MW; mcv.height = MH;
   var mctx = mcv.getContext("2d", { willReadFrequently: true });
 
-  var imgs = { c: [], o: [], m: [] }, dirty = true;
+  var imgs = { c: [], o: [], m: [], e: [] }, dirty = true;
   function load(key, i) {
     var arr = imgs[key];
     if (!arr[i]) { var im = new Image(); arr[i] = im; im.onload = function () { dirty = true; }; im.src = FR[i][key]; }
@@ -235,13 +245,19 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
   function ease(t) { return 1 - Math.pow(1 - t, 4); }
   function glide(to, dur) { view.from = view.ang; view.to = to; view.t = 0; view.dur = dur; view.vel = 0; }
 
+  function lit() {
+    if (lights.level < 0.01) return;
+    var e = load("e", shownIdx);
+    if (!ready(e)) { dirty = true; return; }
+    ctx.globalAlpha = lights.level; ctx.drawImage(e, 0, 0, FW, FH); ctx.globalAlpha = 1;
+  }
   function draw() {
     var idx = mod(Math.round(view.ang), N), im = load("c", idx);
     if (!ready(im)) { dirty = true; return; }
     if (shownIdx !== idx) { shownIdx = idx; if (!view.dragging && !view.vel) load("o", idx); }
     ctx.clearRect(0, 0, FW, FH);
     ctx.drawImage(im, 0, 0, FW, FH);
-    if (win.fl + win.fr + win.rl + win.rr < 0.5) return;
+    if (win.fl + win.fr + win.rl + win.rr < 0.5) { lit(); return; }
     var m = maskFor(idx), op = load("o", idx);
     if (!m || !ready(op)) { dirty = true; return; }
     var s = 1 / MS;
@@ -255,6 +271,7 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
       tctx.drawImage(op, 0, 0, FW, FH);
       ctx.drawImage(tmp, x, y, w, h * p, x, y, w, h * p);
     }
+    lit();
   }
 
   var host = window.KingHost || null;
@@ -262,7 +279,7 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
   function setWindow(id, open) {
     goal[id] = open ? 100 : 0;
     if (host && host.setWindow) host.setWindow(id, open ? "open" : "close");
-    $("hint").classList.add("off");
+    
   }
   function toggle(id) { setWindow(id, goal[id] < 50); }
   $("winAll").addEventListener("click", function () {
@@ -298,7 +315,7 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
     var dx = (e.clientX - ptr.last) / scale, now = Date.now();
     ptr.moved += Math.abs(e.clientX - ptr.last); ptr.last = e.clientX;
     if (ptr.moved > 8) {
-      box.classList.add("drag"); $("hint").classList.add("off");
+      box.classList.add("drag"); 
       var d = -dx / PX_PER_FRAME;
       view.ang += d;
       view.vel = view.vel * 0.5 + 0.5 * d / Math.max(0.012, (now - ptr.t) / 1000);
@@ -362,7 +379,7 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
     if (diff >= -4 && diff <= 1) return "carnaval";
     return "standard";
   }
-  var modePref = "auto", theme = "", prevTheme = "", themeAt = 0, parts = [], oldParts = [];
+  var modePref = "auto", theme = "", pending = "", swapT = 0, parts = [];
   try { modePref = localStorage.getItem("king-home-mode") || "auto"; } catch (err) {}
   function applyMode(pref, quiet) {
     if (pref !== "auto" && !(pref in GREET)) pref = "auto";
@@ -370,23 +387,79 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
     if (!quiet) { try { localStorage.setItem("king-home-mode", pref); } catch (err) {} }
     Array.prototype.forEach.call(document.querySelectorAll("[data-mode]"), function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-mode") === pref ? "true" : "false"); });
     var next = pref === "auto" ? autoTheme(new Date()) : pref;
-    if (next === theme) return;
-    prevTheme = theme; oldParts = parts; theme = next; themeAt = Date.now(); parts = seed(theme);
-    H.setAttribute("data-theme", theme);
-    var g = $("greet"); g.style.opacity = 0;
-    setTimeout(function () { g.textContent = GREET[theme]; g.style.opacity = 1; }, 300);
+    if (next === (pending || theme)) return;
+    var first = !theme, g = $("greet");
+    function swap() { pending = ""; theme = next; parts = seed(theme); H.setAttribute("data-theme", theme); g.textContent = GREET[theme]; g.style.opacity = 1; fbc.style.opacity = 1; ffc.style.opacity = 1; }
+    if (first) { swap(); return; }
+    pending = next;
+    g.style.opacity = 0; fbc.style.opacity = 0; ffc.style.opacity = 0;
+    clearTimeout(swapT); swapT = setTimeout(swap, 340);
   }
   Array.prototype.forEach.call(document.querySelectorAll("[data-mode]"), function (b) {
     b.addEventListener("click", function () { applyMode(b.getAttribute("data-mode")); });
   });
 
-  var fb = $("fxBack").getContext("2d"), ff = $("fxFront").getContext("2d");
+  var fbc = $("fxBack"), ffc = $("fxFront"), fb = fbc.getContext("2d"), ff = ffc.getContext("2d");
+  var CAM = {{cam}}, CX = 36, CY = Math.round(256 + (600 - FH) / 2);
+  function camAt(idx) {
+    var a = idx * 6.283185 / N, ce = Math.cos(CAM.el), se = Math.sin(CAM.el);
+    var p = [CAM.r * ce * Math.sin(a), -CAM.r * ce * Math.cos(a), CAM.tz + CAM.r * se];
+    var f = [-p[0], -p[1], CAM.tz - p[2]], l = Math.sqrt(f[0] * f[0] + f[1] * f[1] + f[2] * f[2]);
+    f = [f[0] / l, f[1] / l, f[2] / l];
+    var r = [f[1], -f[0], 0], rl = Math.sqrt(r[0] * r[0] + r[1] * r[1]); r = [r[0] / rl, r[1] / rl, 0];
+    return { p: p, f: f, r: r, u: [r[1] * f[2], -r[0] * f[2], r[0] * f[1] - r[1] * f[0]] };
+  }
+  var camNow = camAt(0), camIdx = -1, camStage = null;
+  function PS(sx, sd, h) {
+    var keep = camNow; camNow = camStage;
+    var c = camStage, q = P(sx * c.r[0] - sd * c.f[0] * 1.0125, sx * c.r[1] - sd * c.f[1] * 1.0125, h);
+    camNow = keep; return q;
+  }
+  function P(x, y, z) {
+    var c = camNow, dx = x * 0.01 - c.p[0], dy = y * 0.01 - c.p[1], dz = CAM.zg + z * 0.01 - c.p[2];
+    var w = dx * c.f[0] + dy * c.f[1] + dz * c.f[2], k = 500 / CAM.tf / w;
+    return [CX + (800 + (dx * c.r[0] + dy * c.r[1]) * k - CAM.box[0]) * CAM.sc, CY + (500 - (dx * c.u[0] + dy * c.u[1] + dz * c.u[2]) * k - CAM.box[1]) * CAM.sc, w];
+  }
+  function groundPath(c, pts) { c.beginPath(); for (var i = 0; i < pts.length; i++) { var q = P(pts[i][0], pts[i][1], 0); if (i) c.lineTo(q[0], q[1]); else c.moveTo(q[0], q[1]); } c.closePath(); }
+  function circle(r, n) { var o = []; for (var i = 0; i < n; i++) o.push([Math.cos(i * 6.283185 / n) * r, Math.sin(i * 6.283185 / n) * r]); return o; }
+  var FOOT = (function () { var o = []; for (var i = 0; i < 40; i++) { var t = i * 6.283185 / 40, c = Math.cos(t), s = Math.sin(t); o.push([0.96 * (c < 0 ? -1 : 1) * Math.pow(Math.abs(c), 0.5), 2.44 * (s < 0 ? -1 : 1) * Math.pow(Math.abs(s), 0.5)]); } return o; })();
+  function pool(rgb, radius, strength) {
+    var o = P(0, 0, 0), a = P(camNow.r[0] * radius, camNow.r[1] * radius, 0), b = P(-camNow.f[0] * radius, -camNow.f[1] * radius, 0);
+    var rx = Math.abs(a[0] - o[0]), ry = Math.abs(b[1] - o[1]);
+    fb.save(); fb.translate(o[0], o[1]); fb.scale(1, ry / rx);
+    var g = fb.createRadialGradient(0, 0, 0, 0, 0, rx);
+    g.addColorStop(0, "rgba(" + rgb + "," + strength + ")"); g.addColorStop(0.45, "rgba(" + rgb + "," + (strength * 0.62).toFixed(3) + ")"); g.addColorStop(1, "rgba(" + rgb + ",0)");
+    fb.fillStyle = g; fb.beginPath(); fb.arc(0, 0, rx, 0, 6.3); fb.fill(); fb.restore();
+  }
+  function shadow(pts, strength, grow) {
+    fb.fillStyle = "#000";
+    for (var k = 0; k < 9; k++) {
+      var s = 1 + grow - k * grow / 5;
+      fb.globalAlpha = strength / 5;
+      groundPath(fb, pts.map(function (q) { return [q[0] * s, q[1] * s]; })); fb.fill();
+    }
+    fb.globalAlpha = 1;
+  }
+  var SPR = { pumpkin: "{{img:home/prop-pumpkin.webp}}", plaid: "{{img:home/prop-plaid.webp}}", red: "{{img:home/prop-red.webp}}", pine: "{{img:home/prop-pine.webp}}" }, sprites = {};
+  function sprite(name) {
+    if (!sprites[name]) { sprites[name] = new Image(); sprites[name].src = SPR[name]; }
+    return sprites[name];
+  }
   var CONF = ["#F4C21B", "#2FA35B", "#E5392C", "#2E7BE3", "#F3F3F1", "#E052A0"];
   function rnd(a, b) { return a + Math.random() * (b - a); }
+  var SCENES = {
+    standard: { pool: ["34,34,33", 6.4], props: [] },
+    halloween: { pool: ["46,31,16", 6], props: [["pumpkin", 1.62, 3.7, 0.52, 1], ["pumpkin", 1.2, 4.6, 0.34, 1], ["pumpkin", 1.88, 4.75, 0.42, 1], ["pumpkin", 2.25, -3.9, 0.44, 1], ["pumpkin", -2.3, -1.9, 0.4, 1]] },
+    christmas: { pool: ["150,160,170", 5.4], props: [["plaid", 1.62, 3.7, 0.5], ["red", 1.2, 4.6, 0.34], ["red", 1.9, 4.8, 0.42], ["pine", 2.12, -4.6, 1.3], ["pine", 1.5, -7.2, 0.95], ["pine", -2.28, -2.2, 0.8]] },
+    carnaval: { pool: ["44,38,22", 6.4], props: [] }
+  };
   function seed(name) {
     var out = [], i;
-    if (name === "christmas") for (i = 0; i < 170; i++) out.push({ x: rnd(0, 1340), y: rnd(-1200, 1200), r: rnd(1.2, 4.4), v: rnd(24, 74), ph: rnd(0, 6.3), front: i % 5 === 0 });
-    if (name === "carnaval") for (i = 0; i < 120; i++) out.push({ x: rnd(0, 1340), y: rnd(-1200, 1200), w: rnd(9, 17), h: rnd(5, 9), v: rnd(60, 150), ph: rnd(0, 6.3), sp: rnd(1.5, 4), c: CONF[i % CONF.length], front: i % 4 === 0 });
+    if (name === "christmas") for (i = 0; i < 190; i++) out.push({ x: rnd(0, 1360), y: rnd(-1200, 1200), r: rnd(1.2, 4.6), v: rnd(24, 78), ph: rnd(0, 6.3), front: i % 5 === 0 });
+    if (name === "carnaval") {
+      for (i = 0; i < 110; i++) out.push({ x: rnd(0, 1360), y: rnd(-1200, 1200), w: rnd(9, 17), h: rnd(5, 9), v: rnd(60, 150), ph: rnd(0, 6.3), sp: rnd(1.5, 4), c: CONF[i % 6], front: i % 4 === 0 });
+      for (i = 0; i < 260; i++) { var a = rnd(0, 6.3), r = 1.2 + 6.5 * Math.sqrt(Math.random()); out.push({ g: 1, x: Math.cos(a) * r, y: Math.sin(a) * r, s: rnd(0.03, 0.07), ph: rnd(0, 3.1), c: CONF[i % 6] }); }
+    }
     if (name === "halloween") for (i = 0; i < 6; i++) out.push({ x: rnd(300, 1300), y: rnd(220, 600), v: rnd(60, 120), s: rnd(0.8, 1.7), ph: rnd(0, 6.3), dir: i % 2 ? 1 : -1 });
     return out;
   }
@@ -402,42 +475,101 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
     c.quadraticCurveTo(x + w * 0.45, y - up, x, y + 3 * s);
     c.fill();
   }
-  function scene(name, list, alpha, dt, t) {
-    var i, p, c;
-    if (name === "christmas") for (i = 0; i < list.length; i++) {
-      p = list[i]; p.y += p.v * dt; if (p.y > 1210) { p.y = -10; p.x = rnd(0, 1340); }
-      c = p.front ? ff : fb;
-      c.globalAlpha = alpha * (p.front ? 0.92 : 0.22 + p.r / 8);
-      c.fillStyle = "#F3F3F1"; c.beginPath(); c.arc(p.x + Math.sin(t * 0.6 + p.ph) * 14, p.y, p.r, 0, 6.3); c.fill();
+  function drawScene(dt, now) {
+    var t = now / 1000, S = SCENES[theme], i, p, c, q;
+    if (camIdx !== shownIdx && shownIdx >= 0) { camIdx = shownIdx; camNow = camAt(camIdx); }
+    if (!camStage) camStage = camAt(HERO);
+    fb.clearRect(0, 0, 1360, 1200); ff.clearRect(0, 0, 1360, 1200);
+    if (theme === "halloween") { fb.fillStyle = "#E7E1D0"; fb.beginPath(); fb.arc(880, 470, 290, 0, 6.3); fb.fill(); }
+    pool(S.pool[0], S.pool[1], 1);
+    if (theme === "standard") {
+      fb.strokeStyle = "#343433"; fb.lineWidth = 1.5; groundPath(fb, circle(3.55, 96)); fb.stroke();
+      fb.beginPath();
+      for (i = 0; i < 72; i++) { var a = i * 6.283185 / 72, r1 = i % 18 === 0 ? 3.95 : i % 6 === 0 ? 3.78 : 3.66, q0 = P(Math.cos(a) * 3.55, Math.sin(a) * 3.55, 0), q1 = P(Math.cos(a) * r1, Math.sin(a) * r1, 0); fb.moveTo(q0[0], q0[1]); fb.lineTo(q1[0], q1[1]); }
+      fb.stroke();
     }
-    if (name === "carnaval") for (i = 0; i < list.length; i++) {
-      p = list[i]; p.y += p.v * dt; if (p.y > 1210) { p.y = -10; p.x = rnd(0, 1340); }
-      c = p.front ? ff : fb;
-      var sq = Math.cos(t * p.sp + p.ph);
-      c.globalAlpha = alpha * (p.front ? 0.95 : 0.5); c.fillStyle = p.c;
-      c.save(); c.translate(p.x + Math.sin(t * 0.9 + p.ph) * 22, p.y); c.rotate(t * p.sp * 0.4 + p.ph); c.fillRect(-p.w / 2, -p.h * sq / 2, p.w, p.h * sq); c.restore();
+    if (theme === "carnaval") for (i = 0; i < parts.length; i++) {
+      p = parts[i]; if (!p.g) continue;
+      fb.fillStyle = p.c; fb.globalAlpha = 0.8;
+      var cs = Math.cos(p.ph) * p.s, sn = Math.sin(p.ph) * p.s;
+      groundPath(fb, [[p.x - cs, p.y - sn], [p.x - sn * 0.5, p.y + cs * 0.5], [p.x + cs, p.y + sn], [p.x + sn * 0.5, p.y - cs * 0.5]]); fb.fill();
     }
-    if (name === "halloween") {
-      var rise = (1 - alpha) * 90;
-      fb.globalAlpha = alpha; fb.fillStyle = "#E7E1D0"; fb.beginPath(); fb.arc(860, 520 + rise, 300, 0, 6.3); fb.fill();
+    fb.globalAlpha = 1;
+    shadow(FOOT, theme === "christmas" ? 0.62 : 0.8, 0.16);
+    if (theme === "halloween") {
       fb.fillStyle = "#000";
-      for (i = 0; i < list.length; i++) {
-        p = list[i]; p.x += p.v * p.dir * dt;
+      for (i = 0; i < parts.length; i++) {
+        p = parts[i]; p.x += p.v * p.dir * dt;
         if (p.dir > 0 && p.x > 1300) { p.x = 380; p.y = rnd(220, 600); }
         if (p.dir < 0 && p.x < 380) { p.x = 1300; p.y = rnd(220, 600); }
         bat(fb, p.x, p.y + Math.sin(t * 1.7 + p.ph) * 18, p.s, Math.sin(t * 9 + p.ph));
       }
     }
-  }
-  var fxIdle = false;
-  function drawFx(dt, now) {
-    var k = Math.min(1, (now - themeAt) / 900), fading = k < 1 && prevTheme && prevTheme !== "standard";
-    if (theme === "standard" && !fading) { if (!fxIdle) { fb.clearRect(0, 0, 1340, 1200); ff.clearRect(0, 0, 1340, 1200); fxIdle = true; } return; }
-    fxIdle = false;
-    fb.clearRect(0, 0, 1340, 1200); ff.clearRect(0, 0, 1340, 1200);
-    if (fading) scene(prevTheme, oldParts, 1 - k, dt, now / 1000);
-    scene(theme, parts, ease(k), dt, now / 1000);
+    var list = S.props.map(function (pr) { return { pr: pr, b: PS(pr[1], pr[2], 0), top: PS(pr[1], pr[2], pr[3]) }; });
+    list.sort(function (a, b) { return a.pr[2] - b.pr[2]; });
+    for (i = 0; i < list.length; i++) {
+      var it = list[i], im = sprite(it.pr[0]);
+      if (!ready(im)) continue;
+      var hpx = it.b[1] - it.top[1], wpx = hpx * im.naturalWidth / im.naturalHeight;
+      c = it.pr[2] < 0 ? fb : ff;
+      c.fillStyle = "#000"; c.globalAlpha = 0.2;
+      for (q = 0; q < 3; q++) { c.beginPath(); c.ellipse(it.b[0], it.b[1] - hpx * 0.03, wpx * (0.36 + q * 0.1), wpx * (0.36 + q * 0.1) * 0.17, 0, 0, 6.3); c.fill(); }
+      c.globalAlpha = 1;
+      c.drawImage(im, it.b[0] - wpx / 2, it.b[1] - hpx * 0.97, wpx, hpx);
+      if (it.pr[4]) { c.globalCompositeOperation = "lighter"; c.globalAlpha = 0.1 + 0.1 * Math.sin(t * 7 + i * 2.1) * Math.sin(t * 2.3 + i); c.drawImage(im, it.b[0] - wpx / 2, it.b[1] - hpx * 0.97, wpx, hpx); c.globalCompositeOperation = "source-over"; c.globalAlpha = 1; }
+    }
+    if (theme === "christmas") for (i = 0; i < parts.length; i++) {
+      p = parts[i]; p.y += p.v * dt; if (p.y > 1210) { p.y = -10; p.x = rnd(0, 1360); }
+      c = p.front ? ff : fb;
+      c.globalAlpha = p.front ? 0.92 : 0.25 + p.r / 8;
+      c.fillStyle = "#F3F3F1"; c.beginPath(); c.arc(p.x + Math.sin(t * 0.6 + p.ph) * 14, p.y, p.r, 0, 6.3); c.fill();
+    }
+    if (theme === "carnaval") for (i = 0; i < parts.length; i++) {
+      p = parts[i]; if (p.g) continue;
+      p.y += p.v * dt; if (p.y > 1210) { p.y = -10; p.x = rnd(0, 1360); }
+      c = p.front ? ff : fb;
+      var sq = Math.cos(t * p.sp + p.ph);
+      c.globalAlpha = p.front ? 0.95 : 0.55; c.fillStyle = p.c;
+      c.save(); c.translate(p.x + Math.sin(t * 0.9 + p.ph) * 22, p.y); c.rotate(t * p.sp * 0.4 + p.ph); c.fillRect(-p.w / 2, -p.h * sq / 2, p.w, p.h * sq); c.restore();
+    }
     fb.globalAlpha = 1; ff.globalAlpha = 1;
+  }
+
+  var lights = { level: 0, base: 0, cue: [] };
+  function flash() { var n = Date.now(); lights.cue = [[n, 1], [n + 170, 0], [n + 330, 1], [n + 520, 0], [n + 700, lights.base]]; if (host && host.flashLights) host.flashLights(); }
+  function wake() { var n = Date.now(); lights.base = 1; lights.cue = [[n, 1], [n + 150, 0.15], [n + 320, 1]]; }
+  function stepLights(dt, now) {
+    var goal = lights.base;
+    for (var i = 0; i < lights.cue.length; i++) if (lights.cue[i][0] <= now) goal = lights.cue[i][1];
+    if (lights.cue.length && lights.cue[lights.cue.length - 1][0] + 400 < now) lights.cue = [];
+    if (lights.level !== goal) { lights.level += (goal - lights.level) * Math.min(1, dt * 26); if (Math.abs(goal - lights.level) < 0.01) lights.level = goal; dirty = true; }
+  }
+
+  var tags = {}, tagsShown = false;
+  Array.prototype.forEach.call(document.querySelectorAll("[data-tag]"), function (b) {
+    var id = b.getAttribute("data-tag");
+    tags[id] = { el: b, text: b.querySelector("span"), line: b.querySelector("i"), on: false };
+    b.addEventListener("click", function () { if (id === "lights") flash(); else toggle(id); });
+  });
+  function placeTags(calm) {
+    var m = calm && shownIdx >= 0 ? maskFor(shownIdx) : null, s = 1 / MS, used = [], id, tg, i;
+    for (i = 0; i < 4; i++) {
+      id = WIN[i]; tg = tags[id];
+      var b = m && m.wins[id], show = !!b && b.n > 900;
+      if (show) {
+        var x = CX + (b.x0 + b.x1) / 2 * s, y = CY + (b.y0 + (b.y1 - b.y0) * 0.3) * s, lift = 74;
+        used.forEach(function (ux) { if (Math.abs(ux - x) < 150) lift += 52; });
+        used.push(x);
+        tg.el.style.transform = "translate(" + Math.round(x) + "px," + Math.round(y) + "px) translate(-50%,-100%)";
+        tg.line.style.height = lift + "px";
+        tg.text.textContent = goal[id] > 50 ? "Close" : "Open";
+      }
+      if (show !== tg.on) { tg.on = show; tg.el.classList.toggle("on", show); }
+    }
+    tg = tags.lights;
+    var a = shownIdx * 6.283185 / N, front = calm && shownIdx >= 0 && Math.cos(a) > 0.25;
+    if (front) { var q = P(Math.sin(a) > 0 ? 0.72 : -0.72, -2.2, 0.66); tg.el.style.transform = "translate(" + Math.round(q[0]) + "px," + Math.round(q[1]) + "px) translate(-50%,0)"; tg.line.style.height = "104px"; }
+    if (front !== tg.on) { tg.on = front; tg.el.classList.toggle("on", front); }
   }
 
   var nf = function (n) { return Math.round(n).toLocaleString("pt-BR"); };
@@ -472,8 +604,11 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
     });
     var key = WIN.map(function (id) { return (win[id] > 99 ? 2 : win[id] < 1 ? 0 : 1) + ":" + goal[id]; }).join(",");
     if (key !== lastKey) { lastKey = key; glassText(); }
+    stepLights(dt, now);
     if (dirty) { dirty = false; draw(); }
-    drawFx(dt, now);
+    var calm = !view.dragging && !view.vel && view.t >= 1 && introDone;
+    placeTags(calm);
+    drawScene(dt, now);
   }
   var raf = window.requestAnimationFrame ? function () { frame(); requestAnimationFrame(raf); } : null;
   if (raf) requestAnimationFrame(raf);
@@ -484,7 +619,10 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
     H.classList.remove("intro"); H.classList.add("on");
     setTimeout(function () { H.classList.add("live"); }, 1900);
     view.ang = HERO + N * 0.36; glide(HERO, 2.2);
+    introDone = false; lights.level = 0; lights.base = 0; lights.cue = [];
+    clearTimeout(introT); introT = setTimeout(function () { introDone = true; wake(); }, 2300);
   }
+  var introDone = false, introT = 0;
 
   window.KingHome = {
     update: apply, start: start, setMode: applyMode,
@@ -505,10 +643,10 @@ body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 
 
   var mq = /mode=(\w+)/.exec(q), wq = /open=([\w,]+)/.exec(q), aq = /ang=(\d+)/.exec(q);
   applyMode(mq ? mq[1] : modePref, !!mq);
-  for (var i = 0; i < N; i++) { load("c", (HERO + i) % N); load("m", (HERO + i) % N); }
+  for (var i = 0; i < N; i++) { load("c", (HERO + i) % N); load("m", (HERO + i) % N); load("e", (HERO + i) % N); }
   load("o", HERO);
   start();
-  if (/still/.test(q)) { H.classList.add("live"); H.classList.add("still"); themeAt = 1; view.t = 1; view.ang = HERO; }
+  if (/still/.test(q)) { H.classList.add("live"); H.classList.add("still"); view.t = 1; view.ang = HERO; clearTimeout(introT); introDone = true; lights.base = lights.level = 1; }
   if (aq) { view.t = 1; view.ang = +aq[1]; }
   if (wq) wq[1].split(",").forEach(function (id) { if (id in win) win[id] = goal[id] = 100; });
 })();

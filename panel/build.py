@@ -23,5 +23,7 @@ build("road.src.html", "king-road.html")
 
 home = here / "assets" / "home"
 meta = json.loads((home / "meta.json").read_text())
-frames = [{k: uri(home / f"{k}{i:02d}.{'png' if k == 'm' else 'webp'}") for k in "com"} for i in range(meta["n"])]
-build("home.src.html", "king-home.html", {"frames": json.dumps(frames), "fw": str(meta["fw"]), "fh": str(meta["fh"]), "ms": str(meta["ms"])})
+frames = [{k: uri(home / f"{k}{i:02d}.{'png' if k == 'm' else 'webp'}") for k in "come"} for i in range(meta["n"])]
+import math
+cam = {"r": meta["r"], "el": math.radians(meta["el"]), "tz": meta["tz"], "tf": meta["tf"], "box": meta["box"], "sc": meta["sc"], "zg": meta["zg"]}
+build("home.src.html", "king-home.html", {"frames": json.dumps(frames), "cam": json.dumps(cam), "fw": str(meta["fw"]), "fh": str(meta["fh"]), "ms": str(meta["ms"])})
