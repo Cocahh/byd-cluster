@@ -1,0 +1,362 @@
+<meta charset="utf-8">
+<title>King Driver Panel</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap">
+<style>
+:root {
+  --bg: #F3F4F2;
+  --fg: #16191C;
+  --muted: #5E656C;
+  --line: #D5D8D6;
+  --btn: #FFFFFF;
+  --btn-on: #16191C;
+  --btn-on-fg: #F3F4F2;
+  --p-bg: #0A0C0E;
+  --p-fg: #EDEBE6;
+  --p-muted: #7D838A;
+  --p-faint: #2A2F34;
+  --p-elec: #5FB3DE;
+  --p-fuel: #E0A23E;
+  --p-turn: #3DBE6A;
+  --p-warn: #E5483B;
+  --f-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "Archivo", "Helvetica Neue", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111416; --fg: #E9EAE7; --muted: #949BA2; --line: #2A2F33;
+    --btn: #1A1E21; --btn-on: #E9EAE7; --btn-on-fg: #111416; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111416; --fg: #E9EAE7; --muted: #949BA2; --line: #2A2F33;
+  --btn: #1A1E21; --btn-on: #E9EAE7; --btn-on-fg: #111416; color-scheme: dark;
+}
+html, body { height: 100%; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--f-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 1120px; margin: 0 auto; padding-block: 40px 56px; display: grid; gap: 24px; }
+.head { display: grid; gap: 8px; }
+.head h1 { margin: 0; font-size: clamp(26px, 4vw, 36px); font-weight: 700; font-variation-settings: "wdth" 110; letter-spacing: 0; text-wrap: balance; }
+.head p { margin: 0; color: var(--muted); font-size: 16px; line-height: 1.5; max-width: 62ch; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.controls button {
+  font: 500 15px/1 var(--f-body); color: var(--fg); background: var(--btn);
+  border: 1px solid var(--line); border-radius: 6px; padding: 10px 14px; cursor: pointer;
+}
+.controls button[aria-pressed="true"] { background: var(--btn-on); color: var(--btn-on-fg); border-color: var(--btn-on); }
+.controls button:focus-visible { outline: 2px solid var(--p-elec); outline-offset: 2px; }
+.controls .sep { width: 1px; height: 24px; background: var(--line); margin-inline: 4px; }
+.stage { position: relative; width: 100%; max-width: 100%; aspect-ratio: 1280 / 480; border-radius: 10px; overflow: hidden; background: var(--p-bg); }
+.notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px 32px; color: var(--muted); font-size: 15px; line-height: 1.5; }
+.notes b { color: var(--fg); font-weight: 600; display: block; margin-bottom: 2px; }
+
+.panel {
+  position: absolute; left: 0; top: 0; width: 1280px; height: 480px; transform-origin: 0 0;
+  background: var(--p-bg); color: var(--p-fg); font-family: var(--f-display);
+  font-variant-numeric: tabular-nums; overflow: hidden; user-select: none;
+}
+.panel * { box-sizing: border-box; }
+.turn { position: absolute; top: 30px; width: 44px; height: 36px; color: var(--p-faint); }
+.turn.on { color: var(--p-turn); }
+.turn.l { left: 56px; } .turn.r { right: 56px; }
+.turn svg { width: 100%; height: 100%; display: block; fill: currentColor; }
+
+.mode { position: absolute; top: 30px; left: 0; right: 0; text-align: center; font-size: 24px; font-weight: 600; font-variation-settings: "wdth" 100; color: var(--p-elec); transition: color .4s; }
+.mode.fuel { color: var(--p-fuel); }
+.mode.idle { color: var(--p-muted); }
+
+.speed { position: absolute; left: 400px; width: 480px; top: 58px; text-align: center; font-size: 196px; line-height: 1; font-weight: 700; font-variation-settings: "wdth" 112; letter-spacing: 0; }
+.unit { position: absolute; left: 400px; width: 480px; top: 250px; text-align: center; font-size: 22px; color: var(--p-muted); font-weight: 500; }
+
+.power { position: absolute; left: 420px; width: 440px; top: 296px; }
+.power .track { position: relative; height: 8px; background: var(--p-faint); border-radius: 4px; }
+.power .zero { position: absolute; left: 25%; top: -6px; width: 2px; height: 20px; background: var(--p-muted); }
+.power .fill { position: absolute; top: 0; height: 8px; border-radius: 4px; background: var(--p-elec); transition: background-color .4s; }
+.power .fill.fuel { background: var(--p-fuel); }
+.power .fill.regen { background: var(--p-elec); }
+.power .scale { display: flex; justify-content: space-between; margin-top: 10px; font-size: 16px; color: var(--p-muted); }
+.power .kw { color: var(--p-fg); }
+
+.gears { position: absolute; left: 400px; width: 480px; top: 352px; display: flex; justify-content: center; gap: 30px; font-size: 30px; font-weight: 700; font-variation-settings: "wdth" 105; }
+.gears span { color: var(--p-faint); padding-bottom: 4px; border-bottom: 3px solid transparent; min-width: 22px; text-align: center; }
+.gears span.on { color: var(--p-fg); border-bottom-color: var(--p-fg); }
+
+.store { position: absolute; top: 112px; width: 300px; }
+.store.batt { left: 56px; }
+.store.fuel { right: 56px; text-align: right; }
+.store .label { font-size: 20px; color: var(--p-muted); font-weight: 500; }
+.store .val { font-size: 92px; line-height: 1; font-weight: 650; font-variation-settings: "wdth" 100; margin-top: 8px; }
+.store .val small { font-size: 40px; font-weight: 500; color: var(--p-muted); margin-left: 4px; }
+.bar { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; margin-top: 20px; height: 12px; }
+.bar i { display: block; border-radius: 2px; background: var(--p-faint); }
+.batt .bar i.on { background: var(--p-elec); }
+.fuel .bar i.on { background: var(--p-fuel); }
+.bar i.low { background: var(--p-warn) !important; }
+.store .sub { margin-top: 18px; font-size: 20px; color: var(--p-muted); }
+.store .sub b { color: var(--p-fg); font-weight: 600; }
+
+.foot { position: absolute; left: 56px; right: 56px; bottom: 26px; border-top: 1px solid var(--p-faint); padding-top: 14px; display: flex; justify-content: space-between; font-size: 18px; color: var(--p-muted); }
+.foot span b { color: var(--p-fg); font-weight: 600; margin-left: 6px; }
+.foot .grp { display: flex; gap: 28px; }
+
+.warns { position: absolute; top: 76px; left: 0; right: 0; display: flex; justify-content: center; gap: 12px; }
+.warns span { font-size: 18px; font-weight: 600; padding: 4px 10px; border-radius: 4px; background: var(--p-warn); color: #fff; }
+.warns span.amber { background: var(--p-fuel); color: #111; }
+
+body.car { padding: 0; background: #000; overflow: hidden; }
+body.car .page { display: block; max-width: none; padding: 0; height: 100%; }
+body.car .head, body.car .controls, body.car .notes { display: none; }
+body.car .stage { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .mode, .power .fill { transition: none; }
+}
+</style>
+
+<div class="page">
+  <header class="head">
+    <h1>King Driver Panel</h1>
+    <p>First design for the King's 8.8 inch driver display, shown here on a simulated drive. On the car, every value comes from the King itself: speed, gear, battery, fuel, power and range.</p>
+  </header>
+
+  <div class="controls" role="group" aria-label="Simulated drive">
+    <button id="sc-city" type="button" data-sc="city" aria-pressed="true">City</button>
+    <button id="sc-highway" type="button" data-sc="highway" aria-pressed="false">Highway</button>
+    <button id="sc-parked" type="button" data-sc="parked" aria-pressed="false">Parked</button>
+    <span class="sep" aria-hidden="true"></span>
+    <button id="sc-pause" type="button" aria-pressed="false">Pause</button>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="panel" id="panel" aria-label="Driver display">
+      <div class="turn l" id="turnL"><svg viewBox="0 0 44 36" aria-hidden="true"><path d="M0 18 20 0v11h24v14H20v11z"/></svg></div>
+      <div class="turn r" id="turnR"><svg viewBox="0 0 44 36" aria-hidden="true"><path d="M44 18 24 0v11H0v14h24v11z"/></svg></div>
+
+      <div class="mode" id="mode">Ready</div>
+      <div class="warns" id="warns"></div>
+
+      <div class="speed" id="speed">0</div>
+      <div class="unit">km/h</div>
+
+      <div class="power">
+        <div class="track"><div class="zero"></div><div class="fill" id="pfill"></div></div>
+        <div class="scale"><span>Charge</span><span class="kw" id="kw">0 kW</span><span>Power</span></div>
+      </div>
+
+      <div class="gears" id="gears"><span data-g="P">P</span><span data-g="R">R</span><span data-g="N">N</span><span data-g="D">D</span></div>
+
+      <div class="store batt">
+        <div class="label">Battery</div>
+        <div class="val"><span id="soc">0</span><small>%</small></div>
+        <div class="bar" id="socBar"></div>
+        <div class="sub">Electric range <b id="evr">0 km</b></div>
+      </div>
+
+      <div class="store fuel">
+        <div class="label">Fuel</div>
+        <div class="val"><span id="fuel">0</span><small>%</small></div>
+        <div class="bar" id="fuelBar"></div>
+        <div class="sub">Total range <b id="tr">0 km</b></div>
+      </div>
+
+      <div class="foot">
+        <div class="grp"><span>Odometer<b id="odo">0 km</b></span><span>Trip<b id="trip">0.0 km</b></span></div>
+        <div class="grp"><span>Fuel use<b id="l100">0.0 L/100 km</b></span><span>Electric use<b id="kwh">0.0 kWh/100 km</b></span></div>
+        <div class="grp"><span>Outside<b id="temp">0°C</b></span><span><b id="clock">00:00</b></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="notes">
+    <div><b>Blue is electric, amber is fuel</b>The mode, power bar and stores turn amber when the 1.5 engine joins in, so you can see the hybrid working at a glance.</div>
+    <div><b>Power, not revs</b>The bar runs from charging on the left to full power on the right. The mark is zero. Braking and lifting off fill it to the left.</div>
+    <div><b>Safety lights stay BYD's</b>Seat belt, airbag, brake and engine warnings stay on the King's own display. This design keeps a red row free for anything the car reports.</div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var panel = $("panel"), stage = $("stage");
+  var carMode = /^#car/.test(location.hash);
+  if (carMode) document.body.classList.add("car");
+
+  function fit() {
+    var w = stage.clientWidth, h = stage.clientHeight;
+    var s = carMode ? Math.min(w / 1280, h / 480) : w / 1280;
+    var ox = carMode ? (w - 1280 * s) / 2 : 0, oy = carMode ? (h - 480 * s) / 2 : 0;
+    panel.style.transform = "translate(" + ox + "px," + oy + "px) scale(" + s + ")";
+  }
+  if (window.ResizeObserver) new ResizeObserver(fit).observe(stage);
+  window.addEventListener("resize", fit);
+  fit();
+
+  function bar(el) { var h = ""; for (var i = 0; i < 10; i++) h += "<i></i>"; el.innerHTML = h; return el.children; }
+  var socSegs = bar($("socBar")), fuelSegs = bar($("fuelBar"));
+  function fillBar(segs, pct, lowAt) {
+    var n = Math.ceil(pct / 10);
+    for (var i = 0; i < 10; i++) {
+      segs[i].className = i < n ? (pct <= lowAt ? "on low" : "on") : "";
+    }
+  }
+
+  var MAX_KW = 145, MIN_KW = -48;
+  var shown = { speed: 0, kw: 0 };
+  var target = null;
+  var nf = function (n) { return Math.round(n).toLocaleString("pt-BR"); };
+
+  function render() {
+    var s = target;
+    if (!s) return;
+    shown.speed += (s.speed - shown.speed) * 0.25;
+    shown.kw += (s.powerKw - shown.kw) * 0.2;
+    $("speed").textContent = Math.round(shown.speed);
+
+    var kw = shown.kw, span = MAX_KW - MIN_KW, zero = -MIN_KW / span;
+    var f = $("pfill");
+    if (kw >= 0) { f.style.left = (zero * 100) + "%"; f.style.width = (Math.min(kw, MAX_KW) / span * 100) + "%"; }
+    else { var w = Math.min(-kw, -MIN_KW) / span; f.style.left = ((zero - w) * 100) + "%"; f.style.width = (w * 100) + "%"; }
+    f.className = "fill" + (kw < -0.5 ? " regen" : (s.engineOn ? " fuel" : ""));
+    $("kw").textContent = Math.round(kw) + " kW";
+  }
+
+  function apply(s) {
+    target = s;
+    var m = $("mode");
+    if (s.gear === "P" && s.engineOn) { m.textContent = "Engine charging"; m.className = "mode fuel"; }
+    else if (s.gear === "P") { m.textContent = "Ready"; m.className = "mode idle"; }
+    else if (s.engineOn) { m.textContent = "Hybrid"; m.className = "mode fuel"; }
+    else { m.textContent = "EV"; m.className = "mode"; }
+
+    var gs = $("gears").children;
+    for (var i = 0; i < gs.length; i++) gs[i].className = gs[i].getAttribute("data-g") === s.gear ? "on" : "";
+
+    $("soc").textContent = Math.round(s.soc);
+    $("fuel").textContent = Math.round(s.fuelPct);
+    fillBar(socSegs, s.soc, 15);
+    fillBar(fuelSegs, s.fuelPct, 12);
+    $("evr").textContent = nf(s.evRangeKm) + " km";
+    $("tr").textContent = nf(s.totalRangeKm) + " km";
+    $("odo").textContent = nf(s.odoKm) + " km";
+    $("trip").textContent = s.tripKm.toFixed(1).replace(".", ",") + " km";
+    $("l100").textContent = s.tripL100.toFixed(1).replace(".", ",") + " L/100 km";
+    $("kwh").textContent = s.tripKwh100.toFixed(1).replace(".", ",") + " kWh/100 km";
+    $("temp").textContent = Math.round(s.outsideC) + "°C";
+    $("clock").textContent = s.clock;
+    $("turnL").className = "turn l" + (s.turnL ? " on" : "");
+    $("turnR").className = "turn r" + (s.turnR ? " on" : "");
+
+    var w = $("warns"), html = "";
+    (s.warnings || []).forEach(function (x) { html += '<span class="' + (x.level === "amber" ? "amber" : "") + '">' + x.label + "</span>"; });
+    w.innerHTML = html;
+    $("mode").style.visibility = html ? "hidden" : "visible";
+  }
+
+  window.KingPanel = { update: apply };
+
+  setInterval(render, 33);
+
+  var SCENES = {
+    city: [[0, 0, "P"], [3, 0, "D"], [5, 32], [11, 48], [17, 48], [22, 0], [27, 0], [29, 38, 0, "L"], [36, 55], [43, 60], [48, 22], [52, 22, 0, "R"], [57, 0], [61, 0]],
+    highway: [[0, 88, "D"], [6, 105], [14, 118], [24, 118], [30, 96], [36, 96, 0, "L"], [42, 124], [52, 112], [60, 88]],
+    parked: [[0, 0, "P"], [60, 0]]
+  };
+
+  var sim = {
+    scene: "city", t: 0, paused: false,
+    speed: 0, soc: 64, fuel: 72, odo: 18432, trip: 12.4, fuelUsedL: 0.48, kwhUsed: 1.76, engineOn: false,
+    last: null
+  };
+
+  function sceneAt(name, t) {
+    var k = SCENES[name], dur = k[k.length - 1][0], tt = t % dur, gear = "D", turn = null;
+    for (var i = 0; i < k.length; i++) { if (k[i][0] <= tt) { if (k[i][2]) gear = k[i][2]; } }
+    for (i = 0; i < k.length - 1; i++) {
+      if (tt >= k[i][0] && tt < k[i + 1][0]) {
+        if (k[i][3] && tt - k[i][0] < 4) turn = k[i][3];
+        var a = k[i], b = k[i + 1], f = (tt - a[0]) / (b[0] - a[0]);
+        return { speed: a[1] + (b[1] - a[1]) * f, gear: gear, turn: turn };
+      }
+    }
+    return { speed: k[k.length - 1][1], gear: gear, turn: null };
+  }
+
+  function step(dt) {
+    sim.t += dt;
+    var sc = sceneAt(sim.scene, sim.t);
+    var prev = sim.speed;
+    sim.speed = sc.speed;
+    var v = sim.speed / 3.6, a = (sim.speed - prev) / 3.6 / Math.max(dt, 1e-3);
+    var force = 1650 * a + 0.5 * 1.2 * 0.62 * 2.35 * v * v + 160;
+    var kw = force * v / 1000;
+    if (kw < 0) kw = Math.max(kw, MIN_KW);
+    if (sc.gear === "P") kw = 0;
+
+    var wantEngine = sim.speed > 78 || kw > 70 || sim.soc < 25;
+    if (sc.gear === "P") wantEngine = sim.soc < 25;
+    sim.engineOn = wantEngine;
+
+    var hrs = dt / 3600, boost = 6;
+    if (kw < 0) sim.soc += (-kw * hrs * boost) / 18.3 * 100;
+    else if (!sim.engineOn) { sim.soc -= (kw * hrs * boost) / 18.3 * 100; sim.kwhUsed += kw * hrs * boost; }
+    if (sim.engineOn) {
+      var lph = 1.2 + Math.max(kw, 0) * 0.075;
+      sim.fuelUsedL += lph * hrs * boost;
+      sim.fuel -= (lph * hrs * boost) / 48 * 100;
+      if (sim.soc < 30) sim.soc += 6 * hrs * boost / 18.3 * 100;
+    }
+    sim.soc = Math.min(100, Math.max(5, sim.soc));
+    sim.fuel = Math.min(100, Math.max(3, sim.fuel));
+    var km = v * dt / 1000 * boost;
+    sim.trip += km; sim.odo += km;
+
+    var blink = Math.floor(sim.t * 2.6) % 2 === 0;
+    var d = new Date();
+    return {
+      speed: sim.speed, gear: sc.gear, powerKw: kw, engineOn: sim.engineOn,
+      soc: sim.soc, fuelPct: sim.fuel,
+      evRangeKm: sim.soc / 100 * 92, totalRangeKm: sim.soc / 100 * 92 + sim.fuel / 100 * 48 * 19.5,
+      odoKm: sim.odo, tripKm: sim.trip,
+      tripL100: sim.trip > 0.2 ? sim.fuelUsedL / sim.trip * 100 : 0,
+      tripKwh100: sim.trip > 0.2 ? sim.kwhUsed / sim.trip * 100 : 0,
+      outsideC: 27, clock: ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2),
+      turnL: sc.turn === "L" && blink, turnR: sc.turn === "R" && blink,
+      warnings: []
+    };
+  }
+
+  function tick() {
+    var ts = Date.now();
+    if (sim.last == null) sim.last = ts;
+    var dt = Math.min((ts - sim.last) / 1000, 0.1);
+    sim.last = ts;
+    if (!sim.paused) apply(step(dt));
+  }
+
+  var runSim = !carMode || /demo/.test(location.hash);
+  if (runSim) {
+    apply(step(0));
+    setInterval(tick, 50);
+  }
+
+  var btns = document.querySelectorAll("[data-sc]");
+  Array.prototype.forEach.call(btns, function (b) {
+    b.addEventListener("click", function () {
+      sim.scene = b.getAttribute("data-sc"); sim.t = 0; sim.trip = 12.4; sim.fuelUsedL = 0.48; sim.kwhUsed = 1.76;
+      if (sim.scene === "parked") sim.soc = Math.min(sim.soc, 22);
+      Array.prototype.forEach.call(btns, function (o) { o.setAttribute("aria-pressed", o === b ? "true" : "false"); });
+    });
+  });
+  $("sc-pause").addEventListener("click", function () {
+    sim.paused = !sim.paused;
+    this.setAttribute("aria-pressed", sim.paused ? "true" : "false");
+    this.textContent = sim.paused ? "Play" : "Pause";
+  });
+})();
+</script>
